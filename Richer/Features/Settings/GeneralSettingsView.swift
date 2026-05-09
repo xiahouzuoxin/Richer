@@ -20,6 +20,8 @@ struct GeneralSettingsView: View {
 
             Section("Permissions") {
                 AccessibilitySection()
+                Divider().opacity(0.4)
+                ScreenCaptureSection()
             }
         }
         .formStyle(.grouped)
@@ -118,5 +120,46 @@ private struct AccessibilitySection: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .onAppear { isTrusted = AccessibilityGuard.isTrusted }
+    }
+}
+
+private struct ScreenCaptureSection: View {
+    @State private var isTrusted: Bool = ScreenCaptureGuard.isTrusted
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: isTrusted ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(isTrusted ? .green : .orange)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Screen Recording")
+                        .font(.body.weight(.medium))
+                    Text(isTrusted ? "Granted — capture & lookup region enabled."
+                                   : "Required for capture & lookup region (⌥⇧S).")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("Re-check") {
+                    isTrusted = ScreenCaptureGuard.isTrusted
+                }
+            }
+            HStack {
+                Button("Open Privacy Settings") {
+                    ScreenCaptureGuard.openSystemPrivacySettings()
+                }
+                .buttonStyle(.borderedProminent)
+                Button("Request Prompt") {
+                    ScreenCaptureGuard.requestTrust()
+                    isTrusted = ScreenCaptureGuard.isTrusted
+                }
+            }
+            Text("Note: like Accessibility, Screen Recording permission is bound to the app's signing identity. After replacing Richer.app you may need to remove the old entry and re-add the new build in System Settings.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .onAppear { isTrusted = ScreenCaptureGuard.isTrusted }
     }
 }

@@ -15,6 +15,8 @@ final class Coordinator {
     private let inputController = InputWindowController()
     private let hotkeys = HotkeyManager()
     private let selection = SelectionCapture()
+    private let regionController = ScreenshotRegionController()
+    private let actionBarController = ActionBarController()
     let providerStore = ProviderStore()
     let refineModeStore = RefineModeStore()
     let translateSettings = TranslateSettings()
@@ -26,6 +28,7 @@ final class Coordinator {
             onSelectionRefine: { [weak self] in self?.handleSelectionHotkey(intent: .refine) },
             onSelectionTranslate: { [weak self] in self?.handleSelectionHotkey(intent: .translate) },
             onSelectionDictionary: { [weak self] in self?.handleSelectionHotkey(intent: .dictionary) },
+            onScreenshotOCR: { [weak self] in self?.handleScreenshotOCR() },
             onInputWindow: { [weak self] in self?.openInputWindow(intent: .refine) }
         )
     }
@@ -41,6 +44,59 @@ final class Coordinator {
                 openPopup(with: text, intent: intent)
             } catch {
                 openPopup(with: "", intent: intent, errorMessage: error.localizedDescription)
+            }
+        }
+    }
+
+    private func handleScreenshotOCR() {
+        Task { @MainActor in
+            // Permission gate. CGRequestScreenCaptureAccess() returns immediately and
+            // triggers an async system prompt; if it says "not yet trusted" we route
+            // the user to System Settings instead of running with no pixels.
+            if !ScreenCaptureGuard.isTrusted {
+                ScreenCaptureGuard.requestTrust()
+                openPopup(
+                    with: "",
+                    intent: .dictionary,
+                    errorMessage: String(localized: "Screen Recording permission required. Open System Settings → Privacy & Security → Screen Recording to enable Richer.")
+                )
+                return
+            }
+
+            guard let rect = await regionController.pickRegion() else {
+                return // user cancelled
+            }
+            // Action-bar dismiss has its own click-outside monitor, so make sure no
+            // stale bar lingers from a previous capture.
+            actionBarController.dismiss()
+
+            guard let image = ScreenshotCapture.capture(rect: rect) else {
+                openPopup(
+                    with: "",
+                    intent: .dictionary,
+                    errorMessage: String(localized: "Couldn't capture the selected region. Try again.")
+                )
+                return
+            }
+
+            do {
+                let text = try await OCRService.recognize(image)
+                actionBarController.show(text: text, nearRect: rect) { [weak self] action in
+                    guard let self else { return }
+                    switch action {
+                    case .refine:
+                        self.openPopup(with: text, intent: .refine)
+                    case .translate:
+                        self.openPopup(with: text, intent: .translate)
+                    case .dictionary:
+                        self.openPopup(with: text, intent: .dictionary)
+                    case .copy:
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(text, forType: .string)
+                    }
+                }
+            } catch {
+                openPopup(with: "", intent: .dictionary, errorMessage: error.localizedDescription)
             }
         }
     }

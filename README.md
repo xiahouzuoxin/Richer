@@ -1,6 +1,6 @@
 # Richer
 
-A free Bob-style **macOS translation assistant** that lives in the menu bar. Refine or translate any text — typed in the input window, or selected anywhere on screen — through the LLM provider and Eudic Dictionary of your choice.
+A free Bob-style **macOS translation assistant** that lives in the menu bar. Refine, translate, or look up any text — typed in the input window, selected in any app, or **captured from any region of the screen via OCR** — through the LLM provider and Eudic Dictionary of your choice.
 
 ## Features
 
@@ -20,6 +20,12 @@ Highlight text in any app, hit `⌥⇧R` (refine) or `⌥⇧T` (translate) or `�
 ![Selection popup](image/selection-popup.png)
 
 ![Dictionary](image/dictionary.png)
+
+### Capture & lookup region (OCR)
+
+For text that isn't selectable — images, PDFs, scanned docs, video subtitles, the OS chrome — press `⌥⇧S` to drag a rectangle anywhere on screen. Richer runs the captured pixels through Apple's on-device Vision OCR (English + 简体/繁体中文) and shows a PopClip-style action bar with `[Refine] [Translate] [Dictionary] [Copy]` next to the rectangle. Pick an action and the recognized text routes through the same popup pipeline as the selection hotkeys.
+
+Requires *Screen Recording* permission (granted once in System Settings).
 
 ### Free LLM providers to get started
 
@@ -64,12 +70,16 @@ See the [Develop](#develop) section.
 4. **Settings → Hotkeys** — defaults:
    - `⌥⇧R` — refine current selection (popup)
    - `⌥⇧T` — translate current selection (popup)
+   - `⌥⇧D` — look up current selection in the dictionary (popup)
+   - `⌥⇧S` — capture a screen region, OCR it, then pick an action
    - `⌥Space` — open the input window
-5. **Grant Accessibility permission** when prompted: *System Settings → Privacy & Security → Accessibility*. The selection-hotkey workflow needs it to synthesize `⌘C` against the focused app.
+5. **Grant permissions** when prompted:
+   - *System Settings → Privacy & Security → **Accessibility*** — needed by `⌥⇧R / ⌥⇧T / ⌥⇧D` to synthesize `⌘C` against the focused app.
+   - *System Settings → Privacy & Security → **Screen Recording*** — needed by `⌥⇧S` to capture pixels for OCR. Restart Richer after granting (a TCC quirk).
 
 ### After moving / replacing the app
 
-- **Re-grant Accessibility.** Remove any old `Richer` entry and add the new path. Different signing identities (e.g. a new download vs. an old debug build) count as separate apps to macOS.
+- **Re-grant Accessibility and Screen Recording.** Remove any old `Richer` entry and add the new path in both *Privacy & Security* lists. Different signing identities (e.g. a new download vs. an old debug build) count as separate apps to macOS, and Screen Recording specifically requires re-launching the app after the new grant.
 - **Re-enter API keys.** Keychain entries are bound to the signing identity, so they don't carry over between a debug-signed copy and a release-signed copy.
 - **Refresh the icon if it looks stale** — macOS caches icons aggressively:
 
@@ -124,15 +134,20 @@ Richer/
   Core/
     Input/             # hotkeys (KeyboardShortcuts), selection capture (⌘C trick + AX fallback)
     LLM/               # protocol + streaming + per-provider adapters
+    Dictionary/        # DictionaryClient + Eudic + macOS Dictionary bridge
+    OCR/               # Vision (VNRecognizeTextRequest) wrapper
+    Capture/           # CGWindowListCreateImage screen-region grabber
     Prompting/         # shared prompt templates
     Keychain/          # API-key storage
-    Permissions/       # Accessibility check
+    Permissions/       # Accessibility + Screen Recording checks
   Features/
     Popup/             # NSPanel + SwiftUI popup (selection-hotkey)
     InputWindow/       # NSPanel + SwiftUI input window with cards
     Cards/             # ActionCard model, store, view models, CardRow
     Refine/            # modes + service
     Translate/         # NLLanguageRecognizer + service
+    Dictionary/        # DictionaryService + DictionaryEntryView
+    Screenshot/        # region picker + post-OCR action bar
     History/           # SwiftData @Model + view
     Settings/          # tabbed Settings scene
   Resources/

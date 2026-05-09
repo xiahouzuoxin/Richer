@@ -51,6 +51,11 @@ struct MenuBarContent: View {
                 shortcut: KeyboardShortcuts.getShortcut(for: .selectionDictionary),
                 action: nil
             )
+            menuRow(
+                title: "Capture & Look Up",
+                shortcut: KeyboardShortcuts.getShortcut(for: .screenshotOCR),
+                action: nil
+            )
 
             Divider()
 

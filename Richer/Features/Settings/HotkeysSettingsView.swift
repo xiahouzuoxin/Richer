@@ -9,6 +9,9 @@ struct HotkeysSettingsView: View {
                 KeyboardShortcuts.Recorder("Translate selection", name: .selectionTranslate)
                 KeyboardShortcuts.Recorder("Look up selection", name: .selectionDictionary)
             }
+            Section("Screen") {
+                KeyboardShortcuts.Recorder("Capture & lookup region", name: .screenshotOCR)
+            }
             Section("Input window") {
                 KeyboardShortcuts.Recorder("Open input window", name: .inputWindow)
             }

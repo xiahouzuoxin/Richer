@@ -42,10 +42,25 @@ final class ActionCardStore {
         save()
     }
 
-    func addSuggestedDefaults(using providerID: UUID) {
+    /// Pick the best provider per action and add suggested cards. LLM-backed actions
+    /// (Refine, Translate) use the first LLM provider; Dictionary uses the first
+    /// Dictionary provider. Skipped if no compatible provider is configured.
+    func addSuggestedDefaults(from providers: [ProviderConfig]) {
         let existing = Set(cards.map { CardSignature(providerID: $0.providerID, action: $0.action) })
-        let candidates: [ActionKind] = [.refine(.polish), .refine(.grammar), .translate]
-        for action in candidates {
+        let llmProvider = providers.first { $0.kind.isLLMKind }
+        let dictProvider = providers.first { $0.kind.isDictionaryKind }
+
+        var candidates: [(UUID, ActionKind)] = []
+        if let llmID = llmProvider?.id {
+            candidates.append((llmID, .refine(.polish)))
+            candidates.append((llmID, .refine(.grammar)))
+            candidates.append((llmID, .translate))
+        }
+        if let dictID = dictProvider?.id {
+            candidates.append((dictID, .dictionary))
+        }
+
+        for (providerID, action) in candidates {
             let sig = CardSignature(providerID: providerID, action: action)
             if !existing.contains(sig) {
                 cards.append(ActionCard(providerID: providerID, action: action))
@@ -77,6 +92,7 @@ private struct CardSignature: Hashable {
         switch action {
         case .refine(let mode): hasher.combine("refine"); hasher.combine(mode)
         case .translate: hasher.combine("translate")
+        case .dictionary: hasher.combine("dictionary")
         }
     }
 }

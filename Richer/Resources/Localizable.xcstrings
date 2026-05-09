@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@." : {
+
+    },
     "• %@" : {
 
     },
@@ -19,6 +22,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "辅助功能"
+          }
+        }
+      }
+    },
+    "Account (optional)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account (optional)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "账户（可选）"
           }
         }
       }
@@ -72,6 +92,56 @@
         }
       }
     },
+    "Add to wordbook" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to wordbook"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加到生词本"
+          }
+        }
+      }
+    },
+    "Added" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已添加"
+          }
+        }
+      }
+    },
+    "Adding…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adding…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加中…"
+          }
+        }
+      }
+    },
     "API key" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -85,6 +155,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "API 密钥"
+          }
+        }
+      }
+    },
+    "API token" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API token"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API 令牌"
           }
         }
       }
@@ -340,6 +427,23 @@
         }
       }
     },
+    "Definition" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definition"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "释义"
+          }
+        }
+      }
+    },
     "Delete" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -357,6 +461,56 @@
         }
       }
     },
+    "Dictionary" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictionary"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "词典"
+          }
+        }
+      }
+    },
+    "Dictionary • %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictionary • %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "词典 • %@"
+          }
+        }
+      }
+    },
+    "Dictionary provider is missing authentication." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictionary provider is missing authentication."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "词典服务缺少身份验证。"
+          }
+        }
+      }
+    },
     "Enter to run · Shift↵ for newline" : {
       "localizations" : {
         "en" : {
@@ -369,6 +523,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "回车运行 · Shift↵ 换行"
+          }
+        }
+      }
+    },
+    "Eudic (欧路词典)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eudic (欧路词典)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "欧路词典"
           }
         }
       }
@@ -402,6 +573,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "通用"
+          }
+        }
+      }
+    },
+    "glm-4-flash is free of charge." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "glm-4-flash is free of charge."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "glm-4-flash 完全免费。"
           }
         }
       }
@@ -470,6 +658,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "快捷键"
+          }
+        }
+      }
+    },
+    "How to find your token (my.eudic.net/OpenAPI)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How to find your token (my.eudic.net/OpenAPI)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如何获取令牌（my.eudic.net/OpenAPI）"
           }
         }
       }
@@ -609,6 +814,90 @@
         }
       }
     },
+    "Look up '%@'" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look up '%@'"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查询「%@」"
+          }
+        }
+      }
+    },
+    "Look up selection" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look up selection"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查询选区"
+          }
+        }
+      }
+    },
+    "Look Up Selection" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look Up Selection"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查询选中文本"
+          }
+        }
+      }
+    },
+    "Lookup is free; sign in to sync wordbook with your Eudic account." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookup is free; sign in to sync wordbook with your Eudic account."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查询免费；登录后可与你的欧路词典账户同步生词本。"
+          }
+        }
+      }
+    },
+    "Lookup works without a token. Sign in to enable wordbook sync with your Eudic account." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lookup works without a token. Sign in to enable wordbook sync with your Eudic account."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无需令牌即可查询。登录后可启用「添加到生词本」与你的欧路词典账户同步。"
+          }
+        }
+      }
+    },
     "Mode" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -626,6 +915,57 @@
         }
       }
     },
+    "No definition found for \"%@\"." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No definition found for \"%@\"."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到「%@」的释义。"
+          }
+        }
+      }
+    },
+    "No dictionary provider configured. Add one in Settings → Providers." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No dictionary provider configured. Add one in Settings → Providers."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未配置词典服务。请在 设置 → 服务商 中添加。"
+          }
+        }
+      }
+    },
+    "No English dictionary is enabled. Open Dictionary.app → Preferences and turn one on." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No English dictionary is enabled. Open Dictionary.app → Preferences and turn one on."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未启用任何英文词典。请打开「词典.app → 偏好设置」启用一本。"
+          }
+        }
+      }
+    },
     "No history yet" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -639,6 +979,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂无历史"
+          }
+        }
+      }
+    },
+    "No LLM provider configured. Add one in Settings → Providers." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No LLM provider configured. Add one in Settings → Providers."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未配置 LLM 服务。请在 设置 → 服务商 中添加。"
           }
         }
       }
@@ -661,6 +1018,23 @@
     },
     "Note: each Xcode rebuild changes the app's signature and invalidates the previous grant. If Richer keeps asking for permission, remove the existing 'Richer' entry from the Accessibility list and add this build's `Richer.app` again." : {
 
+    },
+    "OK · %lld categories" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK · %lld categories"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正常 · %lld 个分类"
+          }
+        }
+      }
     },
     "Open input window" : {
       "extractionState" : "stale",
@@ -865,6 +1239,23 @@
         }
       }
     },
+    "qwen-turbo includes a generous free quota." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "qwen-turbo includes a generous free quota."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "qwen-turbo 提供充足的免费额度。"
+          }
+        }
+      }
+    },
     "Re-check" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -928,6 +1319,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "润色"
+          }
+        }
+      }
+    },
+    "Refine • %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refine • %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "润色 • %@"
           }
         }
       }
@@ -1068,6 +1476,23 @@
         }
       }
     },
+    "Richer • Dictionary" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richer • Dictionary"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richer • 词典"
+          }
+        }
+      }
+    },
     "Richer • Refine" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1098,6 +1523,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Richer • 翻译"
+          }
+        }
+      }
+    },
+    "Runs locally — no API cost." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runs locally — no API cost."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地运行 — 无 API 费用。"
           }
         }
       }
@@ -1335,6 +1777,23 @@
         }
       }
     },
+    "Test connection" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test connection"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "测试连接"
+          }
+        }
+      }
+    },
     "Translate" : {
       "localizations" : {
         "en" : {
@@ -1347,6 +1806,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "翻译"
+          }
+        }
+      }
+    },
+    "Translate → %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate → %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译 → %@"
           }
         }
       }
@@ -1448,6 +1924,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "用户提示词模板(使用 {{text}})"
+          }
+        }
+      }
+    },
+    "via %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "via %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "来源：%@"
           }
         }
       }

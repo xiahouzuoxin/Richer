@@ -34,7 +34,10 @@ final class InputViewModel {
     func rebuildViewModels() {
         var next: [UUID: CardViewModel] = [:]
         for card in enabledCards {
-            if let existing = cardViewModels[card.id] {
+            // Reuse the existing view model only if the card's content hasn't changed.
+            // CardViewModel snapshots `card` at init, so any edit (action, provider,
+            // refine mode) needs a fresh view model to render correctly.
+            if let existing = cardViewModels[card.id], existing.card == card {
                 next[card.id] = existing
             } else {
                 next[card.id] = CardViewModel(

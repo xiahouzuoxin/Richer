@@ -28,9 +28,9 @@ struct PopupView: View {
 
     private var header: some View {
         HStack {
-            Image(systemName: viewModel.intent == .refine ? "wand.and.stars" : "globe")
+            Image(systemName: headerSymbol)
                 .foregroundStyle(.tint)
-            Text(viewModel.intent == .refine ? "Richer • Refine" : "Richer • Translate")
+            Text(headerTitle)
                 .font(.subheadline.weight(.medium))
             if !viewModel.providerLabelInUse.isEmpty {
                 Text("• \(viewModel.providerLabelInUse)")
@@ -50,6 +50,22 @@ struct PopupView: View {
         .padding(.vertical, 8)
     }
 
+    private var headerSymbol: String {
+        switch viewModel.intent {
+        case .refine: "wand.and.stars"
+        case .translate: "globe"
+        case .dictionary: "book"
+        }
+    }
+
+    private var headerTitle: LocalizedStringKey {
+        switch viewModel.intent {
+        case .refine: "Richer • Refine"
+        case .translate: "Richer • Translate"
+        case .dictionary: "Richer • Dictionary"
+        }
+    }
+
     private var actionBar: some View {
         HStack(spacing: 6) {
             Picker("", selection: Binding(
@@ -58,9 +74,10 @@ struct PopupView: View {
             )) {
                 Text("Refine").tag(WriteIntent.refine)
                 Text("Translate").tag(WriteIntent.translate)
+                Text("Dictionary").tag(WriteIntent.dictionary)
             }
             .pickerStyle(.segmented)
-            .frame(width: 180)
+            .frame(width: 240)
 
             if viewModel.intent == .refine {
                 ForEach(RefineMode.allCases) { mode in
@@ -110,51 +127,89 @@ struct PopupView: View {
 
     private var content: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if !viewModel.originalText.isEmpty {
-                Text("Original")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                ScrollView {
-                    Text(viewModel.originalText)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                }
-                .frame(maxHeight: 80)
-            }
-
-            if let error = viewModel.errorMessage {
-                VStack(alignment: .leading, spacing: 6) {
-                    Label(error, systemImage: "exclamationmark.triangle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                    if error.localizedCaseInsensitiveContains("accessibility") {
-                        Button("Open Privacy Settings") {
-                            AccessibilityGuard.openSystemPrivacySettings()
-                        }
-                        .controlSize(.small)
-                    }
-                }
-            } else {
-                Text(viewModel.intent == .refine ? "Refined" : "Translation")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                ScrollView {
-                    Text(viewModel.resultText.isEmpty ? "…" : viewModel.resultText)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                }
-                .frame(minHeight: 60, maxHeight: 200)
-
-                HStack {
-                    Spacer()
-                    Button("Copy") {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(viewModel.resultText, forType: .string)
-                    }
-                    .disabled(viewModel.resultText.isEmpty)
-                }
-            }
+            originalSection
+            resultSection
         }
         .padding(12)
+    }
+
+    @ViewBuilder
+    private var originalSection: some View {
+        if !viewModel.originalText.isEmpty, viewModel.intent != .dictionary {
+            Text("Original")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            ScrollView {
+                Text(viewModel.originalText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(maxHeight: 80)
+        }
+    }
+
+    @ViewBuilder
+    private var resultSection: some View {
+        if let error = viewModel.errorMessage {
+            errorSection(error)
+        } else if case .dictionary(let entry) = viewModel.result {
+            dictionarySection(entry: entry)
+        } else {
+            textResultSection
+        }
+    }
+
+    private func dictionarySection(entry: DictionaryEntry) -> DictionaryEntryView {
+        DictionaryEntryView(entry: entry, onAddToWordbook: wordbookHandler)
+    }
+
+    private var wordbookHandler: (@MainActor () async throws -> Void)? {
+        guard viewModel.providerCanWriteWordbook else { return nil }
+        return { [vm = viewModel] in try await vm.addToWordbook() }
+    }
+
+    @ViewBuilder
+    private func errorSection(_ error: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(error, systemImage: "exclamationmark.triangle.fill")
+                .font(.caption)
+                .foregroundStyle(.orange)
+            if error.localizedCaseInsensitiveContains("accessibility") {
+                Button("Open Privacy Settings") {
+                    AccessibilityGuard.openSystemPrivacySettings()
+                }
+                .controlSize(.small)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var textResultSection: some View {
+        Text(resultLabel)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        ScrollView {
+            Text(viewModel.result.streamingText.isEmpty ? "…" : viewModel.result.streamingText)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .textSelection(.enabled)
+        }
+        .frame(minHeight: 60, maxHeight: 200)
+
+        HStack {
+            Spacer()
+            Button("Copy") {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(viewModel.result.asText, forType: .string)
+            }
+            .disabled(viewModel.result.isEmpty)
+        }
+    }
+
+    private var resultLabel: LocalizedStringKey {
+        switch viewModel.intent {
+        case .refine: "Refined"
+        case .translate: "Translation"
+        case .dictionary: "Definition"
+        }
     }
 }

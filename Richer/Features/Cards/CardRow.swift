@@ -58,31 +58,58 @@ struct CardRow: View {
             errorLabel(String(localized: "Provider missing — edit in Settings → Cards."))
         } else if let error = viewModel.errorMessage {
             errorLabel(error)
+        } else if case .dictionary(let entry) = viewModel.result {
+            dictionaryBody(entry: entry)
         } else {
-            VStack(alignment: .leading, spacing: 6) {
-                if let target = viewModel.resolvedTargetLanguage {
-                    Text("→ \(LanguageDetector.displayName(for: target))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                ScrollView {
-                    Text(viewModel.resultText.isEmpty ? "…" : viewModel.resultText)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                        .font(.system(size: 13))
-                        .transaction { $0.animation = nil }
-                }
-                .frame(minHeight: 40, maxHeight: 200)
+            textBody
+        }
+    }
 
-                HStack(spacing: 12) {
-                    Spacer()
-                    iconButton(systemName: "arrow.clockwise", help: "Re-run", action: onRerun)
-                        .disabled(viewModel.isStreaming)
-                    iconButton(systemName: "doc.on.doc", help: "Copy result") {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(viewModel.resultText, forType: .string)
-                    }
-                    .disabled(viewModel.resultText.isEmpty)
+    private var textBody: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if let target = viewModel.resolvedTargetLanguage {
+                Text("→ \(LanguageDetector.displayName(for: target))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            ScrollView {
+                Text(viewModel.result.streamingText.isEmpty ? "…" : viewModel.result.streamingText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+                    .font(.system(size: 13))
+                    .transaction { $0.animation = nil }
+            }
+            .frame(minHeight: 40, maxHeight: 200)
+
+            HStack(spacing: 12) {
+                Spacer()
+                iconButton(systemName: "arrow.clockwise", help: "Re-run", action: onRerun)
+                    .disabled(viewModel.isStreaming)
+                iconButton(systemName: "doc.on.doc", help: "Copy result") {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(viewModel.result.asText, forType: .string)
+                }
+                .disabled(viewModel.result.isEmpty)
+            }
+        }
+    }
+
+    private var wordbookHandler: (@MainActor () async throws -> Void)? {
+        guard viewModel.providerCanWriteWordbook else { return nil }
+        return { [vm = viewModel] in try await vm.addToWordbook() }
+    }
+
+    private func dictionaryBody(entry: DictionaryEntry) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            DictionaryEntryView(entry: entry, onAddToWordbook: wordbookHandler)
+
+            HStack(spacing: 12) {
+                Spacer()
+                iconButton(systemName: "arrow.clockwise", help: "Re-run", action: onRerun)
+                    .disabled(viewModel.isStreaming)
+                iconButton(systemName: "doc.on.doc", help: "Copy summary") {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(entry.plainTextSummary, forType: .string)
                 }
             }
         }

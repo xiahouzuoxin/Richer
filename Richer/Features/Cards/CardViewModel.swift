@@ -7,13 +7,16 @@ import SwiftData
 final class CardViewModel {
     let card: ActionCard
     var isExpanded: Bool = false
-    var resultText: String = ""
+    var result: ActionResult = .empty
     var isStreaming: Bool = false
     var errorMessage: String?
     var providerLabel: String = ""
     var resolvedTargetLanguage: String?
-    /// Hash of the input that produced the current `resultText`. Used to detect staleness.
+    /// Hash of the input that produced the current `result`. Used to detect staleness.
     var lastRunInputHash: Int?
+
+    /// Convenience for tests / clients that only consume streamed text.
+    var resultText: String { result.asText }
 
     private let providerStore: ProviderStore
     private let refineModeStore: RefineModeStore
@@ -41,6 +44,16 @@ final class CardViewModel {
         providerStore.providers.first { $0.id == card.providerID } == nil
     }
 
+    /// True only when the card's action is .dictionary AND the provider has credentials
+    /// that allow writing to the user's wordbook (Eudic with a saved token).
+    var providerCanWriteWordbook: Bool {
+        guard case .dictionary = card.action,
+              let provider = providerStore.providers.first(where: { $0.id == card.providerID }),
+              let client = try? providerStore.makeDictionaryClient(for: provider)
+        else { return false }
+        return client.canWriteWordbook
+    }
+
     /// Click handler. Only changes the visual expansion state; never cancels in-flight work.
     /// When expanding, runs the action only if the result is empty/stale and not already streaming.
     func toggle(input: String, targetOverride: String?, modelContext: ModelContext) {
@@ -50,7 +63,7 @@ final class CardViewModel {
         }
         isExpanded = true
         let trimmedHash = input.trimmingCharacters(in: .whitespacesAndNewlines).hashValue
-        let needsRun = !isStreaming && (resultText.isEmpty || lastRunInputHash != trimmedHash)
+        let needsRun = !isStreaming && (result.isEmpty || lastRunInputHash != trimmedHash)
         if needsRun {
             run(input: input, targetOverride: targetOverride, modelContext: modelContext)
         }
@@ -68,7 +81,7 @@ final class CardViewModel {
             return
         }
         cancel()
-        resultText = ""
+        result = .empty
         errorMessage = nil
         isStreaming = true
         lastRunInputHash = trimmed.hashValue
@@ -82,32 +95,45 @@ final class CardViewModel {
 
                 switch card.action {
                 case .refine(let mode):
+                    result = .streamingText("")
                     let service = RefineService(providerStore: providerStore, modeStore: refineModeStore)
                     let stream = try service.stream(text: trimmed, mode: mode, provider: provider)
                     for try await delta in stream {
                         if Task.isCancelled { break }
-                        resultText += delta.text
+                        result = .streamingText(result.streamingText + delta.text)
                     }
                     if !Task.isCancelled {
                         HistoryWriter.record(
                             in: modelContext, kind: .refine,
-                            original: trimmed, result: resultText,
+                            original: trimmed, result: result.streamingText,
                             modeOrTargetLang: mode.rawValue, provider: provider
                         )
                     }
                 case .translate:
+                    result = .streamingText("")
                     let service = TranslateService(providerStore: providerStore, settings: translateSettings)
                     let (stream, target) = try service.stream(text: trimmed, provider: provider, targetOverride: targetOverride)
                     resolvedTargetLanguage = target
                     for try await delta in stream {
                         if Task.isCancelled { break }
-                        resultText += delta.text
+                        result = .streamingText(result.streamingText + delta.text)
                     }
                     if !Task.isCancelled {
                         HistoryWriter.record(
                             in: modelContext, kind: .translate,
-                            original: trimmed, result: resultText,
+                            original: trimmed, result: result.streamingText,
                             modeOrTargetLang: target, provider: provider
+                        )
+                    }
+                case .dictionary:
+                    let service = DictionaryService(providerStore: providerStore)
+                    let entry = try await service.lookup(text: trimmed, provider: provider)
+                    if !Task.isCancelled {
+                        result = .dictionary(entry)
+                        HistoryWriter.record(
+                            in: modelContext, kind: .dictionary,
+                            original: entry.word, result: entry.plainTextSummary,
+                            modeOrTargetLang: entry.sourceLabel, provider: provider
                         )
                     }
                 }
@@ -120,6 +146,17 @@ final class CardViewModel {
         }
     }
 
+    /// Add the current dictionary result's word to the provider's wordbook (Eudic only).
+    /// Throws DictionaryError.missingAuth if no token is configured.
+    func addToWordbook() async throws {
+        guard case .dictionary(let entry) = result else { return }
+        guard let provider = providerStore.providers.first(where: { $0.id == card.providerID }) else {
+            throw LLMError.noActiveProvider
+        }
+        let service = DictionaryService(providerStore: providerStore)
+        try await service.addToWordbook(word: entry.word, provider: provider)
+    }
+
     func cancel() {
         streamTask?.cancel()
         streamTask = nil
@@ -128,7 +165,7 @@ final class CardViewModel {
 
     func reset() {
         cancel()
-        resultText = ""
+        result = .empty
         errorMessage = nil
         resolvedTargetLanguage = nil
         lastRunInputHash = nil

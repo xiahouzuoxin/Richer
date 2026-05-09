@@ -9,6 +9,7 @@ enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable {
     case zhipu
     case openaiCompatible
     case ollama
+    case eudic
 
     var id: String { rawValue }
     var displayName: String {
@@ -20,12 +21,25 @@ enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable {
         case .zhipu: "Zhipu GLM"
         case .openaiCompatible: "OpenAI-compatible"
         case .ollama: "Ollama (local)"
+        case .eudic: "Eudic"
         }
     }
 
     var requiresAPIKey: Bool {
-        switch self { case .ollama: false; default: true }
+        switch self {
+        case .ollama, .eudic: false
+        default: true
+        }
     }
+
+    var isLLMKind: Bool {
+        switch self {
+        case .eudic: false
+        default: true
+        }
+    }
+
+    var isDictionaryKind: Bool { !isLLMKind }
 
     /// First entry is treated as the recommended free-tier default.
     var defaultModels: [String] {
@@ -37,14 +51,16 @@ enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable {
         case .zhipu: ["glm-4-flash", "glm-4-plus", "glm-4-air"]   // glm-4-flash is free
         case .openaiCompatible: []
         case .ollama: ["llama3.2", "qwen2.5"]
+        case .eudic: []
         }
     }
 
     var freeTierNote: String? {
         switch self {
-        case .qwen: "qwen-turbo includes a generous free quota."
-        case .zhipu: "glm-4-flash is free of charge."
-        case .ollama: "Runs locally — no API cost."
+        case .qwen: String(localized: "qwen-turbo includes a generous free quota.")
+        case .zhipu: String(localized: "glm-4-flash is free of charge.")
+        case .ollama: String(localized: "Runs locally — no API cost.")
+        case .eudic: String(localized: "Lookup is free; sign in to sync wordbook with your Eudic account.")
         default: nil
         }
     }
@@ -67,6 +83,7 @@ struct ProviderConfig: Codable, Identifiable, Equatable, Sendable {
         case .zhipu: "https://open.bigmodel.cn/api/paas/v4"
         case .openaiCompatible: ""
         case .ollama: "http://127.0.0.1:11434"
+        case .eudic: "https://api.frdic.com/api/open/v1"
         }
     }
 }
@@ -128,6 +145,23 @@ final class ProviderStore {
         case .ollama:
             let url = URL(string: provider.baseURL) ?? URL(string: "http://127.0.0.1:11434")!
             return OllamaProvider(baseURL: url)
+        case .eudic:
+            throw LLMError.noActiveProvider
+        }
+    }
+
+    func makeDictionaryClient(for provider: ProviderConfig) throws -> DictionaryClient {
+        switch provider.kind {
+        case .eudic:
+            let token: String?
+            if let keyId = provider.keychainKeyId {
+                token = KeychainStore.shared.read(account: keyId)
+            } else {
+                token = nil
+            }
+            return EudicDictionary(token: token, displayName: provider.label)
+        default:
+            throw LLMError.noActiveProvider
         }
     }
 

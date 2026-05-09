@@ -4,6 +4,7 @@ import SwiftData
 enum HistoryKind: String, Codable {
     case refine
     case translate
+    case dictionary
 }
 
 @Model

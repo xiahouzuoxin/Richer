@@ -5,6 +5,7 @@ import SwiftData
 enum WriteIntent: Sendable, Equatable {
     case refine
     case translate
+    case dictionary
 }
 
 @Observable
@@ -24,6 +25,7 @@ final class Coordinator {
         hotkeys.register(
             onSelectionRefine: { [weak self] in self?.handleSelectionHotkey(intent: .refine) },
             onSelectionTranslate: { [weak self] in self?.handleSelectionHotkey(intent: .translate) },
+            onSelectionDictionary: { [weak self] in self?.handleSelectionHotkey(intent: .dictionary) },
             onInputWindow: { [weak self] in self?.openInputWindow(intent: .refine) }
         )
     }
@@ -95,6 +97,8 @@ final class Coordinator {
             openPopup(with: entry.originalText, intent: .refine)
         case .translate:
             openPopup(with: entry.originalText, intent: .translate)
+        case .dictionary:
+            openPopup(with: entry.originalText, intent: .dictionary)
         }
     }
 }

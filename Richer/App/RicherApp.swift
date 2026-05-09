@@ -46,6 +46,11 @@ struct MenuBarContent: View {
                 shortcut: KeyboardShortcuts.getShortcut(for: .selectionRefine),
                 action: nil
             )
+            menuRow(
+                title: "Look Up Selection",
+                shortcut: KeyboardShortcuts.getShortcut(for: .selectionDictionary),
+                action: nil
+            )
 
             Divider()
 

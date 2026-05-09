@@ -55,9 +55,9 @@ private struct HistoryRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
-                Image(systemName: entry.kind == .refine ? "wand.and.stars" : "globe")
+                Image(systemName: kindSymbol)
                     .foregroundStyle(.tint)
-                Text(entry.kind == .refine ? "Refine • \(entry.modeOrTargetLang)" : "Translate → \(entry.modeOrTargetLang)")
+                Text(kindLabel)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.secondary)
                 Spacer()
@@ -72,6 +72,22 @@ private struct HistoryRow: View {
                 .lineLimit(3)
         }
         .padding(.vertical, 4)
+    }
+
+    private var kindSymbol: String {
+        switch entry.kind {
+        case .refine: "wand.and.stars"
+        case .translate: "globe"
+        case .dictionary: "book"
+        }
+    }
+
+    private var kindLabel: String {
+        switch entry.kind {
+        case .refine: String(localized: "Refine • \(entry.modeOrTargetLang)")
+        case .translate: String(localized: "Translate → \(entry.modeOrTargetLang)")
+        case .dictionary: String(localized: "Dictionary • \(entry.modeOrTargetLang)")
+        }
     }
 }
 

@@ -157,14 +157,16 @@ private struct ProviderForm: View {
                 }
                 TextField("Label", text: $draft.label)
                 TextField("Base URL", text: $draft.baseURL)
-                TextField("Default model", text: $draft.defaultModel)
-                if !draft.kind.defaultModels.isEmpty {
-                    HStack {
-                        Text("Suggested:")
-                            .font(.caption).foregroundStyle(.secondary)
-                        ForEach(draft.kind.defaultModels, id: \.self) { m in
-                            Button(m) { draft.defaultModel = m }
-                                .buttonStyle(.link)
+                if draft.kind.isLLMKind {
+                    TextField("Default model", text: $draft.defaultModel)
+                    if !draft.kind.defaultModels.isEmpty {
+                        HStack {
+                            Text("Suggested:")
+                                .font(.caption).foregroundStyle(.secondary)
+                            ForEach(draft.kind.defaultModels, id: \.self) { m in
+                                Button(m) { draft.defaultModel = m }
+                                    .buttonStyle(.link)
+                            }
                         }
                     }
                 }
@@ -174,7 +176,9 @@ private struct ProviderForm: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            if draft.kind.requiresAPIKey {
+            if draft.kind == .eudic {
+                eudicAuthSection
+            } else if draft.kind.requiresAPIKey {
                 Section("Authentication") {
                     SecureField("API key", text: Binding(
                         get: { draft.apiKey ?? "" },
@@ -196,4 +200,63 @@ private struct ProviderForm: View {
         .formStyle(.grouped)
     }
 
+    @State private var eudicTestState: EudicTestState = .idle
+
+    private enum EudicTestState: Equatable {
+        case idle
+        case testing
+        case ok([String])
+        case failed(String)
+    }
+
+    @ViewBuilder
+    private var eudicAuthSection: some View {
+        Section("Account (optional)") {
+            SecureField("API token", text: Binding(
+                get: { draft.apiKey ?? "" },
+                set: { draft.apiKey = $0; eudicTestState = .idle }
+            ))
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Lookup works without a token. Sign in to enable wordbook sync with your Eudic account.")
+                    .font(.caption).foregroundStyle(.secondary)
+                Link("How to find your token (my.eudic.net/OpenAPI)", destination: URL(string: "https://my.eudic.net/OpenAPI/")!)
+                    .font(.caption)
+            }
+            if let token = draft.apiKey, !token.trimmingCharacters(in: .whitespaces).isEmpty {
+                HStack(spacing: 8) {
+                    Button("Test connection") { testEudicConnection(token: token) }
+                        .controlSize(.small)
+                        .disabled(eudicTestState == .testing)
+                    switch eudicTestState {
+                    case .idle:
+                        EmptyView()
+                    case .testing:
+                        ProgressView().controlSize(.mini)
+                    case .ok(let names):
+                        Label("OK · \(names.count) categories", systemImage: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    case .failed(let message):
+                        Label(message, systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                            .lineLimit(2)
+                    }
+                }
+            }
+        }
+    }
+
+    private func testEudicConnection(token: String) {
+        eudicTestState = .testing
+        Task {
+            let client = EudicDictionary(token: token)
+            do {
+                let names = try await client.testConnection()
+                await MainActor.run { eudicTestState = .ok(names) }
+            } catch {
+                await MainActor.run { eudicTestState = .failed(error.localizedDescription) }
+            }
+        }
+    }
 }

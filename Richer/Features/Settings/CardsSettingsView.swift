@@ -41,9 +41,7 @@ struct CardsSettingsView: View {
                         .disabled(selectedID == nil)
                     Spacer()
                     Button("Suggested") {
-                        if let pid = providerStore.activeProvider?.id ?? providerStore.providers.first?.id {
-                            cardStore.addSuggestedDefaults(using: pid)
-                        }
+                        cardStore.addSuggestedDefaults(from: providerStore.providers)
                     }
                     .disabled(providerStore.providers.isEmpty)
                 }
@@ -79,8 +77,11 @@ struct CardsSettingsView: View {
     }
 
     private func addCard() {
-        guard let providerID = coordinator.providerStore.activeProvider?.id ?? coordinator.providerStore.providers.first?.id else { return }
-        let new = ActionCard(providerID: providerID, action: .refine(.polish))
+        let providers = coordinator.providerStore.providers
+        // Prefer an LLM provider for the default Refine action; fall back to first available.
+        let llmProvider = providers.first { $0.kind.isLLMKind } ?? providers.first
+        guard let provider = llmProvider else { return }
+        let new = ActionCard(providerID: provider.id, action: .refine(.polish))
         coordinator.actionCardStore.add(new)
         selectedID = new.id
     }
@@ -125,9 +126,22 @@ private struct CardEditor: View {
     @State private var refineMode: RefineMode
 
     enum ActionTag: String, CaseIterable, Identifiable {
-        case refine, translate
+        case refine, translate, dictionary
         var id: String { rawValue }
-        var label: String { self == .refine ? "Refine" : "Translate" }
+        var label: String {
+            switch self {
+            case .refine: "Refine"
+            case .translate: "Translate"
+            case .dictionary: "Dictionary"
+            }
+        }
+
+        func compatibleProviderKinds(_ kind: ProviderKind) -> Bool {
+            switch self {
+            case .refine, .translate: kind.isLLMKind
+            case .dictionary: kind.isDictionaryKind
+            }
+        }
     }
 
     init(card: ActionCard, providers: [ProviderConfig], onSave: @escaping (ActionCard) -> Void) {
@@ -142,23 +156,32 @@ private struct CardEditor: View {
         case .translate:
             _actionTag = State(initialValue: .translate)
             _refineMode = State(initialValue: .polish)
+        case .dictionary:
+            _actionTag = State(initialValue: .dictionary)
+            _refineMode = State(initialValue: .polish)
         }
+    }
+
+    private var filteredProviders: [ProviderConfig] {
+        providers.filter { actionTag.compatibleProviderKinds($0.kind) }
     }
 
     var body: some View {
         Form {
-            Section("Provider") {
-                Picker("Provider", selection: $providerID) {
-                    ForEach(providers) { provider in
-                        Text(provider.label).tag(provider.id)
-                    }
-                }
-            }
             Section("Action") {
                 Picker("Action", selection: $actionTag) {
                     ForEach(ActionTag.allCases) { Text($0.label).tag($0) }
                 }
                 .pickerStyle(.segmented)
+                .onChange(of: actionTag) { _, newTag in
+                    // If the current provider isn't compatible with the new action,
+                    // pick the first compatible one (or leave unchanged if none).
+                    if let current = providers.first(where: { $0.id == providerID }),
+                       !newTag.compatibleProviderKinds(current.kind),
+                       let firstCompatible = providers.first(where: { newTag.compatibleProviderKinds($0.kind) }) {
+                        providerID = firstCompatible.id
+                    }
+                }
 
                 if actionTag == .refine {
                     Picker("Mode", selection: $refineMode) {
@@ -166,13 +189,37 @@ private struct CardEditor: View {
                     }
                 }
             }
+            Section("Provider") {
+                if filteredProviders.isEmpty {
+                    Label(
+                        actionTag == .dictionary
+                            ? "No dictionary provider configured. Add one in Settings → Providers."
+                            : "No LLM provider configured. Add one in Settings → Providers.",
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                } else {
+                    Picker("Provider", selection: $providerID) {
+                        ForEach(filteredProviders) { provider in
+                            Text(provider.label).tag(provider.id)
+                        }
+                    }
+                }
+            }
             HStack {
                 Spacer()
                 Button("Save") {
-                    let action: ActionKind = actionTag == .refine ? .refine(refineMode) : .translate
+                    let action: ActionKind
+                    switch actionTag {
+                    case .refine: action = .refine(refineMode)
+                    case .translate: action = .translate
+                    case .dictionary: action = .dictionary
+                    }
                     onSave(ActionCard(id: card.id, providerID: providerID, action: action))
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(filteredProviders.isEmpty)
             }
         }
         .formStyle(.grouped)

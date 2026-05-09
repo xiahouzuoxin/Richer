@@ -1,8 +1,6 @@
 # Richer
 
-A free Bob-style **macOS translation assistant** that lives in the menu bar. Refine or translate any text — typed in the input window, or selected anywhere on screen — through the LLM provider of your choice.
-
-
+A free Bob-style **macOS translation assistant** that lives in the menu bar. Refine or translate any text — typed in the input window, or selected anywhere on screen — through the LLM provider and Eudic Dictionary of your choice.
 
 ## Features
 
@@ -17,9 +15,24 @@ The input window pins one **provider** to one **action** per card (e.g. *Polish 
 
 ### Selection popup
 
-Highlight text in any app, hit `⌥⇧R` (refine) or `⌥⇧T` (translate), and a Bob-style popup appears next to the selection — without stealing focus from the source app.
+Highlight text in any app, hit `⌥⇧R` (refine) or `⌥⇧T` (translate) or `⌥⇧D` (dictionary), and a Bob-style popup appears next to the selection — without stealing focus from the source app.
 
 ![Selection popup](image/selection-popup.png)
+
+![Dictionary](image/dictionary.png)
+
+### Free LLM providers to get started
+
+Richer is BYOK (bring your own key) — but a few providers in the app's list offer **genuinely free** models or new-account quotas, enough to try the app without a budget:
+
+| Provider | App "Kind" | What's free | Sign up |
+|---|---|---|---|
+| **Zhipu GLM** | *Zhipu GLM* | `glm-4-flash` and `glm-4-flash-x` are free for everyone | [open.bigmodel.cn](https://open.bigmodel.cn/) |
+| **Qwen DashScope** | *Qwen* | New accounts get a free token quota across `qwen-turbo` / `qwen-plus` / `qwen-long` etc. | [dashscope.console.aliyun.com](https://dashscope.console.aliyun.com/) |
+| **Ollama** (local) | *Ollama* | Fully local — no key, no quota. Pull any model from [ollama.com/library](https://ollama.com/library) and point Richer at `http://localhost:11434`. | [ollama.com](https://ollama.com/) |
+| **Google Gemini** | *OpenAI-compatible* | Free tier on `gemini-2.0-flash` and friends. Base URL: `https://generativelanguage.googleapis.com/v1beta/openai/` | [aistudio.google.com](https://aistudio.google.com/) |
+
+> Free quotas and which models are free shift over time — verify on the provider's pricing page before relying on a tier.
 
 ## Install
 

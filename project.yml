@@ -18,8 +18,8 @@ settings:
     DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Automatic
     PRODUCT_BUNDLE_IDENTIFIER: com.zuoxin.Richer
-    MARKETING_VERSION: "0.2.2"
-    CURRENT_PROJECT_VERSION: "4"
+    MARKETING_VERSION: "0.2.3"
+    CURRENT_PROJECT_VERSION: "5"
     GENERATE_INFOPLIST_FILE: NO
     INFOPLIST_FILE: Richer/Resources/Info.plist
     ENABLE_HARDENED_RUNTIME: YES
@@ -42,6 +42,8 @@ targets:
       properties:
         CFBundleIconName: AppIcon
         CFBundleIconFile: AppIcon
+        NSMicrophoneUsageDescription: "Richer needs microphone access for the input window's dictation button. Your audio is processed on-device by Apple's Speech framework and never leaves your Mac."
+        NSSpeechRecognitionUsageDescription: "Richer uses Apple's on-device speech recognition to turn dictated speech into text. No audio is sent to external servers."
     settings:
       base:
         ENABLE_APP_SANDBOX: NO

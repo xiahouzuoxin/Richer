@@ -195,8 +195,20 @@ struct PopupView: View {
         }
         .frame(minHeight: 60, maxHeight: 200)
 
-        HStack {
+        HStack(spacing: 8) {
             Spacer()
+            let isPlaying = SpeechSynthesizer.shared.isPlaying(viewModel.result.asText)
+            Button {
+                SpeechSynthesizer.shared.toggle(viewModel.result.asText)
+            } label: {
+                Label(
+                    isPlaying ? "Stop reading" : "Read aloud",
+                    systemImage: isPlaying ? "speaker.fill" : "speaker.wave.2"
+                )
+                .labelStyle(.iconOnly)
+            }
+            .disabled(viewModel.result.isEmpty)
+            .help(isPlaying ? "Stop reading" : "Read aloud")
             Button("Copy") {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(viewModel.result.asText, forType: .string)

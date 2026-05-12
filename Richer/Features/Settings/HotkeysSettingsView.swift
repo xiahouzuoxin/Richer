@@ -12,6 +12,9 @@ struct HotkeysSettingsView: View {
             Section("Screen") {
                 KeyboardShortcuts.Recorder("Capture & lookup region", name: .screenshotOCR)
             }
+            Section("Captions") {
+                KeyboardShortcuts.Recorder("Toggle captions bar", name: .captionBar)
+            }
             Section("Input window") {
                 KeyboardShortcuts.Recorder("Open input window", name: .inputWindow)
             }

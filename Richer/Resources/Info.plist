@@ -22,5 +22,9 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Richer needs microphone access for the input window's dictation button. Your audio is processed on-device by Apple's Speech framework and never leaves your Mac.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Richer uses Apple's on-device speech recognition to turn dictated speech into text. No audio is sent to external servers.</string>
 </dict>
 </plist>

@@ -83,6 +83,8 @@ struct CardRow: View {
 
             HStack(spacing: 12) {
                 Spacer()
+                speakerButton(for: viewModel.result.asText)
+                    .disabled(viewModel.result.isEmpty)
                 iconButton(systemName: "arrow.clockwise", help: "Re-run", action: onRerun)
                     .disabled(viewModel.isStreaming)
                 iconButton(systemName: "doc.on.doc", help: "Copy result") {
@@ -105,6 +107,7 @@ struct CardRow: View {
 
             HStack(spacing: 12) {
                 Spacer()
+                speakerButton(for: entry.plainTextSummary)
                 iconButton(systemName: "arrow.clockwise", help: "Re-run", action: onRerun)
                     .disabled(viewModel.isStreaming)
                 iconButton(systemName: "doc.on.doc", help: "Copy summary") {
@@ -113,6 +116,18 @@ struct CardRow: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func speakerButton(for text: String) -> some View {
+        let isPlaying = SpeechSynthesizer.shared.isPlaying(text)
+        iconButton(
+            systemName: isPlaying ? "speaker.fill" : "speaker.wave.2",
+            help: isPlaying ? "Stop reading" : "Read aloud"
+        ) {
+            SpeechSynthesizer.shared.toggle(text)
+        }
+        .foregroundStyle(isPlaying ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
     }
 
     private func errorLabel(_ text: String) -> some View {

@@ -13,6 +13,7 @@ enum WriteIntent: Sendable, Equatable {
 final class Coordinator {
     private let popupController = PopupWindowController()
     private let inputController = InputWindowController()
+    private let captionController = CaptionWindowController()
     private let hotkeys = HotkeyManager()
     private let selection = SelectionCapture()
     private let regionController = ScreenshotRegionController()
@@ -29,6 +30,7 @@ final class Coordinator {
             onSelectionTranslate: { [weak self] in self?.handleSelectionHotkey(intent: .translate) },
             onSelectionDictionary: { [weak self] in self?.handleSelectionHotkey(intent: .dictionary) },
             onScreenshotOCR: { [weak self] in self?.handleScreenshotOCR() },
+            onCaptionBar: { [weak self] in self?.openCaptionBar() },
             onInputWindow: { [weak self] in self?.openInputWindow(intent: .refine) }
         )
     }
@@ -119,10 +121,29 @@ final class Coordinator {
         popupController.show(viewModel: viewModel, at: NSEvent.mouseLocation, modelContainer: modelContainer)
     }
 
-    func openInputWindow(intent: WriteIntent) {
+    func openInputWindow(intent: WriteIntent, prefilledText: String? = nil) {
         NSLog("[Richer] openInputWindow intent=\(intent)")
         guard let modelContainer else {
             NSLog("[Richer] openInputWindow aborted: modelContainer not set")
+            return
+        }
+        if inputController.hasActiveSession {
+            if let prefilledText, !prefilledText.isEmpty {
+                inputController.appendToInput(prefilledText)
+            }
+            // The existing controller will reuse its panel + viewModel when we call show();
+            // the parameter is ignored in the reuse path. Still, satisfy the API.
+            let viewModel = inputController.viewModel ?? InputViewModel(
+                providerStore: providerStore,
+                refineModeStore: refineModeStore,
+                translateSettings: translateSettings,
+                actionCardStore: actionCardStore
+            )
+            inputController.show(
+                viewModel: viewModel,
+                modelContainer: modelContainer,
+                onOpenHistory: { [weak self] in self?.openHistoryWindow() }
+            )
             return
         }
         let viewModel = InputViewModel(
@@ -131,11 +152,18 @@ final class Coordinator {
             translateSettings: translateSettings,
             actionCardStore: actionCardStore
         )
+        if let prefilledText, !prefilledText.isEmpty {
+            viewModel.inputText = prefilledText
+        }
         inputController.show(
             viewModel: viewModel,
             modelContainer: modelContainer,
             onOpenHistory: { [weak self] in self?.openHistoryWindow() }
         )
+    }
+
+    func openCaptionBar() {
+        captionController.show(coordinator: self)
     }
 
     func openHistoryWindow() {

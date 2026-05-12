@@ -56,6 +56,11 @@ struct MenuBarContent: View {
                 shortcut: KeyboardShortcuts.getShortcut(for: .screenshotOCR),
                 action: nil
             )
+            menuRow(
+                title: "Captions Bar",
+                shortcut: KeyboardShortcuts.getShortcut(for: .captionBar),
+                action: { coordinator.openCaptionBar() }
+            )
 
             Divider()
 

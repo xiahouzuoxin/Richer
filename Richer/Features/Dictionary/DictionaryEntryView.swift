@@ -46,8 +46,25 @@ struct DictionaryEntryView: View {
             Text(entry.word)
                 .font(.system(size: 16, weight: .semibold))
                 .textSelection(.enabled)
+            speakerButton
             Spacer()
         }
+    }
+
+    @ViewBuilder
+    private var speakerButton: some View {
+        let isPlaying = SpeechSynthesizer.shared.isPlaying(entry.word)
+        Button {
+            SpeechSynthesizer.shared.toggle(entry.word)
+        } label: {
+            Image(systemName: isPlaying ? "speaker.fill" : "speaker.wave.2")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(isPlaying ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
+                .frame(width: 22, height: 22)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .help(isPlaying ? "Stop reading" : "Read aloud")
     }
 
     private var phoneticsRow: some View {

@@ -22,6 +22,10 @@ struct GeneralSettingsView: View {
                 AccessibilitySection()
                 Divider().opacity(0.4)
                 ScreenCaptureSection()
+                Divider().opacity(0.4)
+                MicrophoneSection()
+                Divider().opacity(0.4)
+                SpeechRecognitionSection()
             }
         }
         .formStyle(.grouped)
@@ -161,5 +165,81 @@ private struct ScreenCaptureSection: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .onAppear { isTrusted = ScreenCaptureGuard.isTrusted }
+    }
+}
+
+private struct MicrophoneSection: View {
+    @State private var isTrusted: Bool = MicrophoneGuard.isTrusted
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: isTrusted ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(isTrusted ? .green : .orange)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Microphone")
+                        .font(.body.weight(.medium))
+                    Text(isTrusted ? "Granted — dictation can capture audio."
+                                   : "Required for dictation (input-window mic button).")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("Re-check") {
+                    isTrusted = MicrophoneGuard.isTrusted
+                }
+            }
+            HStack {
+                Button("Open Privacy Settings") {
+                    MicrophoneGuard.openSystemPrivacySettings()
+                }
+                .buttonStyle(.borderedProminent)
+                Button("Request Prompt") {
+                    MicrophoneGuard.requestTrust { granted in
+                        DispatchQueue.main.async { isTrusted = granted }
+                    }
+                }
+            }
+        }
+        .onAppear { isTrusted = MicrophoneGuard.isTrusted }
+    }
+}
+
+private struct SpeechRecognitionSection: View {
+    @State private var isTrusted: Bool = SpeechRecognitionGuard.isTrusted
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: isTrusted ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(isTrusted ? .green : .orange)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Speech Recognition")
+                        .font(.body.weight(.medium))
+                    Text(isTrusted ? "Granted — on-device transcription enabled."
+                                   : "Required for dictation. On-device only — no audio leaves your Mac.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("Re-check") {
+                    isTrusted = SpeechRecognitionGuard.isTrusted
+                }
+            }
+            HStack {
+                Button("Open Privacy Settings") {
+                    SpeechRecognitionGuard.openSystemPrivacySettings()
+                }
+                .buttonStyle(.borderedProminent)
+                Button("Request Prompt") {
+                    SpeechRecognitionGuard.requestTrust { granted in
+                        isTrusted = granted
+                    }
+                }
+            }
+        }
+        .onAppear { isTrusted = SpeechRecognitionGuard.isTrusted }
     }
 }

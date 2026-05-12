@@ -259,6 +259,40 @@
         }
       }
     },
+    "Captions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captions"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "字幕"
+          }
+        }
+      }
+    },
+    "Captions Bar" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captions Bar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "字幕栏"
+          }
+        }
+      }
+    },
     "Capture & Look Up" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -339,6 +373,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "点击「+」或「建议」创建卡片。"
+          }
+        }
+      }
+    },
+    "Click the mic to start." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Click the mic to start."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击麦克风开始。"
           }
         }
       }
@@ -512,6 +563,57 @@
         }
       }
     },
+    "Dictate" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictate"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音输入"
+          }
+        }
+      }
+    },
+    "Dictation language" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictation language"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音输入语言"
+          }
+        }
+      }
+    },
+    "Dictation language & microphone" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictation language & microphone"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音输入语言与麦克风"
+          }
+        }
+      }
+    },
     "Dictionary" : {
       "localizations" : {
         "en" : {
@@ -675,6 +777,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已授权 — 截屏取词功能可用。"
+          }
+        }
+      }
+    },
+    "Granted — dictation can capture audio." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Granted — dictation can capture audio."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已授权 — 语音输入可捕获音频。"
+          }
+        }
+      }
+    },
+    "Granted — on-device transcription enabled." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Granted — on-device transcription enabled."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已授权 — 本地语音转文字已启用。"
           }
         }
       }
@@ -882,6 +1018,39 @@
         }
       }
     },
+    "Listening…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listening…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聆听中…"
+          }
+        }
+      }
+    },
+    "Listening… · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listening… · %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聆听中… · %@"
+          }
+        }
+      }
+    },
     "Look up '%@'" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -962,6 +1131,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无需令牌即可查询。登录后可启用「添加到生词本」与你的欧路词典账户同步。"
+          }
+        }
+      }
+    },
+    "Microphone" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Microphone"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "麦克风"
+          }
+        }
+      }
+    },
+    "Microphone permission denied. Enable it in System Settings → Privacy & Security → Microphone." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Microphone permission denied. Enable it in System Settings → Privacy & Security → Microphone."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "麦克风权限被拒。请前往 系统设置 → 隐私与安全 → 麦克风 启用。"
           }
         }
       }
@@ -1133,6 +1335,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正常 · %lld 个分类"
+          }
+        }
+      }
+    },
+    "On-device speech recognition isn't available for %@. Pick a different language." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On-device speech recognition isn't available for %@. Pick a different language."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 暂不支持本地语音识别。请选择其他语言。"
           }
         }
       }
@@ -1408,6 +1627,23 @@
         }
       }
     },
+    "Read aloud" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read aloud"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "朗读"
+          }
+        }
+      }
+    },
     "Refine" : {
       "localizations" : {
         "en" : {
@@ -1522,6 +1758,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "截屏取词（⌥⇧S）需要此权限。"
+          }
+        }
+      }
+    },
+    "Required for dictation (input-window mic button)." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Required for dictation (input-window mic button)."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音输入（输入窗口的麦克风按钮）需要此权限。"
+          }
+        }
+      }
+    },
+    "Required for dictation. On-device only — no audio leaves your Mac." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Required for dictation. On-device only — no audio leaves your Mac."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音输入所需。仅在本地处理 — 音频不会离开你的 Mac。"
           }
         }
       }
@@ -1796,6 +2066,23 @@
         }
       }
     },
+    "Send to input window" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send to input window"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送到输入窗口"
+          }
+        }
+      }
+    },
     "Set Active" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1863,6 +2150,73 @@
         }
       }
     },
+    "Speech Recognition" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speech Recognition"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音识别"
+          }
+        }
+      }
+    },
+    "Speech Recognition permission denied. Enable it in System Settings → Privacy & Security → Speech Recognition." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speech Recognition permission denied. Enable it in System Settings → Privacy & Security → Speech Recognition."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音识别权限被拒。请前往 系统设置 → 隐私与安全 → 语音识别 启用。"
+          }
+        }
+      }
+    },
+    "Stop dictating" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop dictating"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止录音"
+          }
+        }
+      }
+    },
+    "Stop reading" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop reading"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止朗读"
+          }
+        }
+      }
+    },
     "Stored in macOS Keychain." : {
       "localizations" : {
         "en" : {
@@ -1908,6 +2262,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "建议:"
+          }
+        }
+      }
+    },
+    "System default" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System default"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统默认"
+          }
+        }
+      }
+    },
+    "system default mic" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "system default mic"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统默认麦克风"
           }
         }
       }
@@ -1958,6 +2345,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "测试连接"
+          }
+        }
+      }
+    },
+    "Toggle captions bar" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle captions bar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换字幕栏"
           }
         }
       }

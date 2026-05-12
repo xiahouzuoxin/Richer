@@ -36,9 +36,21 @@ struct TranslateService {
     /// `override` of nil means "auto" (use primary/secondary fallback against detected source).
     func resolveTargetLanguage(for text: String, override: String?) -> String {
         if let override { return override }
-        let detected = LanguageDetector.detect(text)?.rawValue
-        if let detected, detected == settings.primaryTarget {
+        guard let detected = LanguageDetector.detect(text)?.rawValue else {
+            return settings.primaryTarget
+        }
+        // Compare on the base code so Vision-style "zh-Hans" / "zh-Hant" both match a
+        // bare "zh" target. Otherwise Chinese input with primary="zh" loops back to "zh"
+        // (translating Chinese to Chinese — the bug this guard fixes).
+        let detectedBase = LanguageDetector.baseLanguageCode(detected)
+        let primaryBase = LanguageDetector.baseLanguageCode(settings.primaryTarget)
+        let secondaryBase = LanguageDetector.baseLanguageCode(settings.secondaryTarget)
+
+        if detectedBase == primaryBase {
             return settings.secondaryTarget
+        }
+        if detectedBase == secondaryBase {
+            return settings.primaryTarget
         }
         return settings.primaryTarget
     }

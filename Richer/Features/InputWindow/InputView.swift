@@ -509,6 +509,7 @@ struct InputView: View {
                                             cardVM.toggle(
                                                 input: viewModel.inputText,
                                                 targetOverride: viewModel.targetOverride,
+                                                sourceOverride: viewModel.sourceOverride,
                                                 modelContext: modelContext
                                             )
                                         }
@@ -517,6 +518,7 @@ struct InputView: View {
                                         cardVM.run(
                                             input: viewModel.inputText,
                                             targetOverride: viewModel.targetOverride,
+                                            sourceOverride: viewModel.sourceOverride,
                                             modelContext: modelContext
                                         )
                                     }
@@ -583,6 +585,7 @@ struct InputView: View {
             cardVM.run(
                 input: viewModel.inputText,
                 targetOverride: viewModel.targetOverride,
+                sourceOverride: viewModel.sourceOverride,
                 modelContext: modelContext
             )
         }
@@ -604,6 +607,7 @@ struct InputView: View {
             cardVM.run(
                 input: viewModel.inputText,
                 targetOverride: viewModel.targetOverride,
+                sourceOverride: viewModel.sourceOverride,
                 modelContext: modelContext
             )
         }

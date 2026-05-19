@@ -210,6 +210,9 @@
         }
       }
     },
+    "Auto" : {
+
+    },
     "Auto (en ↔ zh)" : {
       "localizations" : {
         "en" : {

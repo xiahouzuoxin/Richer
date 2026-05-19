@@ -56,7 +56,7 @@ final class CardViewModel {
 
     /// Click handler. Only changes the visual expansion state; never cancels in-flight work.
     /// When expanding, runs the action only if the result is empty/stale and not already streaming.
-    func toggle(input: String, targetOverride: String?, modelContext: ModelContext) {
+    func toggle(input: String, targetOverride: String?, sourceOverride: String? = nil, modelContext: ModelContext) {
         if isExpanded {
             isExpanded = false
             return
@@ -65,7 +65,7 @@ final class CardViewModel {
         let trimmedHash = input.trimmingCharacters(in: .whitespacesAndNewlines).hashValue
         let needsRun = !isStreaming && (result.isEmpty || lastRunInputHash != trimmedHash)
         if needsRun {
-            run(input: input, targetOverride: targetOverride, modelContext: modelContext)
+            run(input: input, targetOverride: targetOverride, sourceOverride: sourceOverride, modelContext: modelContext)
         }
     }
 
@@ -74,7 +74,7 @@ final class CardViewModel {
         isExpanded = false
     }
 
-    func run(input: String, targetOverride: String?, modelContext: ModelContext) {
+    func run(input: String, targetOverride: String?, sourceOverride: String? = nil, modelContext: ModelContext) {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             errorMessage = "Type something to refine or translate."
@@ -112,7 +112,7 @@ final class CardViewModel {
                 case .translate:
                     result = .streamingText("")
                     let service = TranslateService(providerStore: providerStore, settings: translateSettings)
-                    let (stream, target) = try service.stream(text: trimmed, provider: provider, targetOverride: targetOverride)
+                    let (stream, target) = try service.stream(text: trimmed, provider: provider, targetOverride: targetOverride, sourceOverride: sourceOverride)
                     resolvedTargetLanguage = target
                     for try await delta in stream {
                         if Task.isCancelled { break }

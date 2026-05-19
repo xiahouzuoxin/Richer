@@ -60,13 +60,21 @@ struct ClaudeProvider: LLMClient {
             "model": req.model,
             "messages": userAssistantMessages,
             "max_tokens": req.maxTokens ?? 2048,
-            "temperature": req.temperature,
             "stream": true
         ]
+        // Newer Claude models (opus-4-7+) reject the `temperature` parameter outright.
+        if !Self.modelRejectsTemperature(req.model) {
+            body["temperature"] = req.temperature
+        }
         if !systemMessages.isEmpty { body["system"] = systemMessages }
 
         urlReq.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
         return urlReq
+    }
+
+    private static func modelRejectsTemperature(_ model: String) -> Bool {
+        let lower = model.lowercased()
+        return lower.contains("opus-4-7")
     }
 }
 

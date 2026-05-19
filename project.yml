@@ -47,5 +47,5 @@ targets:
     settings:
       base:
         ENABLE_APP_SANDBOX: NO
-        CODE_SIGN_ENTITLEMENTS: ""
+        CODE_SIGN_ENTITLEMENTS: Richer/Resources/Richer.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

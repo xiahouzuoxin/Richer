@@ -14,6 +14,7 @@ final class PopupViewModel {
     var providerLabelInUse: String = ""
     var resolvedTargetLanguage: String?
     var targetOverride: String?    // nil = auto
+    var sourceOverride: String?    // nil = auto-detect
 
     private let providerStore: ProviderStore
     private let refineModeStore: RefineModeStore
@@ -93,7 +94,7 @@ final class PopupViewModel {
                     self.providerLabelInUse = provider.label
                     self.result = .streamingText("")
                     let service = TranslateService(providerStore: providerStore, settings: translateSettings)
-                    let (stream, target) = try service.stream(text: captured.0, provider: provider, targetOverride: self.targetOverride)
+                    let (stream, target) = try service.stream(text: captured.0, provider: provider, targetOverride: self.targetOverride, sourceOverride: self.sourceOverride)
                     self.resolvedTargetLanguage = target
                     for try await delta in stream {
                         if Task.isCancelled { break }
@@ -155,6 +156,11 @@ final class PopupViewModel {
 
     func selectTarget(_ code: String?, modelContext: ModelContext) {
         targetOverride = code
+        if intent == .translate { run(modelContext: modelContext) }
+    }
+
+    func selectSource(_ code: String?, modelContext: ModelContext) {
+        sourceOverride = code
         if intent == .translate { run(modelContext: modelContext) }
     }
 

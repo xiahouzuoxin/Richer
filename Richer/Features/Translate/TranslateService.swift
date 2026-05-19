@@ -32,11 +32,13 @@ struct TranslateService {
     let providerStore: ProviderStore
     let settings: TranslateSettings
 
-    /// Resolve the target language considering an explicit override.
-    /// `override` of nil means "auto" (use primary/secondary fallback against detected source).
-    func resolveTargetLanguage(for text: String, override: String?) -> String {
-        if let override { return override }
-        guard let detected = LanguageDetector.detect(text)?.rawValue else {
+    /// Resolve the target language considering explicit overrides.
+    /// `targetOverride` of nil means "auto" (use primary/secondary fallback against detected source).
+    /// `sourceOverride` of nil means "auto-detect from text". When provided it bypasses NL detection.
+    func resolveTargetLanguage(for text: String, targetOverride: String?, sourceOverride: String? = nil) -> String {
+        if let targetOverride { return targetOverride }
+        let detected: String? = sourceOverride ?? LanguageDetector.detect(text)?.rawValue
+        guard let detected else {
             return settings.primaryTarget
         }
         // Compare on the base code so Vision-style "zh-Hans" / "zh-Hant" both match a
@@ -55,8 +57,8 @@ struct TranslateService {
         return settings.primaryTarget
     }
 
-    func stream(text: String, provider: ProviderConfig, targetOverride: String? = nil) throws -> (AsyncThrowingStream<TextDelta, Error>, String) {
-        let target = resolveTargetLanguage(for: text, override: targetOverride)
+    func stream(text: String, provider: ProviderConfig, targetOverride: String? = nil, sourceOverride: String? = nil) throws -> (AsyncThrowingStream<TextDelta, Error>, String) {
+        let target = resolveTargetLanguage(for: text, targetOverride: targetOverride, sourceOverride: sourceOverride)
         let client = try providerStore.makeClient(for: provider)
         let context = [
             "targetLanguage": LanguageDetector.displayName(for: target)

@@ -91,9 +91,7 @@ struct PopupView: View {
                     .foregroundStyle(viewModel.selectedRefineMode == mode ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
                 }
             } else if viewModel.intent == .translate {
-                targetButton(label: "Auto (en ↔ zh)", code: nil)
-                targetButton(label: "→ EN", code: "en")
-                targetButton(label: "→ ZH", code: "zh")
+                translateLanguagePickers
             }
 
             Spacer()
@@ -106,23 +104,38 @@ struct PopupView: View {
         .padding(.vertical, 6)
     }
 
-    @ViewBuilder
-    private func targetButton(label: LocalizedStringKey, code: String?) -> some View {
-        let isActive = (viewModel.targetOverride == code) || (code == nil && viewModel.targetOverride == nil)
-        Button {
-            viewModel.selectTarget(code, modelContext: modelContext)
-        } label: {
-            Text(label)
-                .font(.caption.weight(.medium))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(isActive ? Color.accentColor.opacity(0.18) : Color.clear)
-                )
-                .foregroundStyle(isActive ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
+    private var translateLanguagePickers: some View {
+        HStack(spacing: 6) {
+            Picker("", selection: Binding(
+                get: { viewModel.sourceOverride ?? "auto" },
+                set: { viewModel.selectSource($0 == "auto" ? nil : $0, modelContext: modelContext) }
+            )) {
+                Text("Auto-detect").tag("auto")
+                ForEach(LanguageOptions.codes, id: \.self) { code in
+                    Text(LanguageDetector.displayName(for: code)).tag(code)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            .fixedSize()
+
+            Image(systemName: "arrow.right")
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(.secondary)
+
+            Picker("", selection: Binding(
+                get: { viewModel.targetOverride ?? "auto" },
+                set: { viewModel.selectTarget($0 == "auto" ? nil : $0, modelContext: modelContext) }
+            )) {
+                Text("Auto").tag("auto")
+                ForEach(LanguageOptions.codes, id: \.self) { code in
+                    Text(LanguageDetector.displayName(for: code)).tag(code)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            .fixedSize()
         }
-        .buttonStyle(.plain)
     }
 
     private var content: some View {

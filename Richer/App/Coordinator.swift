@@ -130,6 +130,8 @@ final class Coordinator {
         if inputController.hasActiveSession {
             if let prefilledText, !prefilledText.isEmpty {
                 inputController.appendToInput(prefilledText)
+            } else {
+                inputController.viewModel?.resetForFreshInput()
             }
             // The existing controller will reuse its panel + viewModel when we call show();
             // the parameter is ignored in the reuse path. Still, satisfy the API.

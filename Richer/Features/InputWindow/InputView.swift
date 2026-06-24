@@ -193,6 +193,16 @@ final class InputViewModel {
         for vm in cardViewModels.values { vm.cancel() }
     }
 
+    func resetForFreshInput() {
+        speechRecognizer.stop()
+        sttErrorMessage = nil
+        sttBasePrefix = ""
+        sttCommittedSuffix = ""
+        cancelAll()
+        inputText = ""
+        resetAllResults()
+    }
+
     func resetAllResults() {
         for vm in cardViewModels.values {
             vm.collapse()
@@ -626,6 +636,7 @@ final class InputWindowController {
     private(set) var viewModel: InputViewModel?
     private var globalMonitor: Any?
     private var isPinned: Bool = false
+    private let presentationLevel: NSWindow.Level = .statusBar
 
     /// True when a panel + viewModel exist (window may be minimized or visible).
     /// Lets callers like the caption bar's "Send to input" know whether to reuse
@@ -647,14 +658,15 @@ final class InputWindowController {
 
         if let existing = panel {
             NSLog("[Richer] reusing existing input panel")
-            existing.makeKeyAndOrderFront(nil)
+            existing.setFrameOrigin(originNearMouse(for: existing.frame.size))
+            present(existing)
             installOutsideMonitorIfNeeded()
             return
         }
         let onPinChanged: (Bool) -> Void = { [weak self] pinned in
             guard let self else { return }
             self.isPinned = pinned
-            self.panel?.level = pinned ? .floating : .normal
+            self.panel?.level = self.presentationLevel
         }
         let view = InputView(
             viewModel: viewModel,
@@ -670,8 +682,8 @@ final class InputWindowController {
         let panel = InputPanel(contentRect: NSRect(x: 0, y: 0, width: 480, height: 380))
         panel.title = "Richer"
         panel.contentView = hosting
-        panel.center()
-        panel.makeKeyAndOrderFront(nil)
+        panel.setFrameOrigin(originNearMouse(for: panel.frame.size))
+        present(panel)
         self.panel = panel
         self.viewModel = viewModel
         installOutsideMonitorIfNeeded()
@@ -715,5 +727,54 @@ final class InputWindowController {
     private func removeOutsideMonitor() {
         if let m = globalMonitor { NSEvent.removeMonitor(m) }
         globalMonitor = nil
+    }
+
+    private func present(_ panel: InputPanel) {
+        panel.level = presentationLevel
+        panel.deminiaturize(nil)
+        panel.orderFrontRegardless()
+        panel.makeKey()
+
+        DispatchQueue.main.async { [weak panel] in
+            panel?.level = self.presentationLevel
+            panel?.orderFrontRegardless()
+            panel?.makeKey()
+        }
+    }
+
+    private func originNearMouse(for size: NSSize) -> NSPoint {
+        let point = NSEvent.mouseLocation
+        let screen = NSScreen.screens.first(where: { $0.frame.contains(point) })
+            ?? NSScreen.main
+            ?? NSScreen.screens.first
+        guard let visible = screen?.visibleFrame else {
+            return NSPoint(x: point.x + 16, y: point.y - size.height - 16)
+        }
+
+        let gap: CGFloat = 16
+        let margin: CGFloat = 10
+        var x = point.x + gap
+        var y = point.y - size.height - gap
+
+        if x + size.width > visible.maxX {
+            x = point.x - size.width - gap
+        }
+        if y < visible.minY {
+            y = point.y + gap
+        }
+        if x < visible.minX {
+            x = visible.minX + margin
+        }
+        if y + size.height > visible.maxY {
+            y = visible.maxY - size.height - margin
+        }
+        if x + size.width > visible.maxX {
+            x = visible.maxX - size.width - margin
+        }
+        if y < visible.minY {
+            y = visible.minY + margin
+        }
+
+        return NSPoint(x: x, y: y)
     }
 }

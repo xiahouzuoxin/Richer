@@ -7,7 +7,7 @@ extension KeyboardShortcuts.Name {
     static let selectionDictionary = Self("selectionDictionary", default: .init(.d, modifiers: [.option, .shift]))
     static let screenshotOCR = Self("screenshotOCR", default: .init(.s, modifiers: [.option, .shift]))
     static let captionBar = Self("captionBar", default: .init(.c, modifiers: [.option, .shift]))
-    static let inputWindow = Self("inputWindow", default: .init(.space, modifiers: [.option]))
+    static let inputWindow = Self("inputWindow", default: .init(.a, modifiers: [.option]))
 }
 
 @MainActor

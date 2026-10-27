@@ -15,10 +15,15 @@ final class KeychainStore {
             kSecAttrService as String: service,
             kSecAttrAccount as String: account
         ]
-        SecItemDelete(baseQuery as CFDictionary)
-        var addQuery = baseQuery
-        addQuery[kSecValueData as String] = data
-        let status = SecItemAdd(addQuery as CFDictionary, nil)
+        // Update atomically so a failed write cannot destroy a rotating OAuth token.
+        var status = SecItemUpdate(baseQuery as CFDictionary,
+            [kSecValueData as String: data] as CFDictionary)
+        if status == errSecItemNotFound {
+            var addQuery = baseQuery
+            addQuery[kSecValueData as String] = data
+            addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            status = SecItemAdd(addQuery as CFDictionary, nil)
+        }
         if status != errSecSuccess {
             NSLog("[Richer] Keychain save failed for account=\(account) status=\(status)")
         }

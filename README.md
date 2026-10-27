@@ -33,13 +33,20 @@ Highlight text in any app, hit a hotkey, and a popup appears next to the selecti
 | `⌥⇧T` | Translate selection (popup) |
 | `⌥⇧D` | Look up selection (popup) |
 | `⌥⇧S` | Capture a screen region, OCR, then pick an action |
-| `⌥Space` | Open the input window |
+| `⌥⇧C` | Toggle live captions |
+| `⌥A` | Open the input window |
 
 All rebindable in *Settings → Hotkeys*.
 
+### Use your ChatGPT subscription (no API key)
+
+In **Settings → Providers**, add a provider and choose **ChatGPT (subscription)**. Click **Continue with ChatGPT**, approve plan usage in your browser, select an available model, then **Save** and **Set Active**. Cards can also select this provider directly.
+
+This uses the official [Sign in with ChatGPT](https://developers.openai.com/siwc/token-sharing-open-source/sign-in) flow and Responses API. Your account must be eligible for ChatGPT plan usage; plan and app limits apply. Credentials stay in macOS Keychain and refresh automatically. Each provider keeps its own account registration. **Sign out** clears local tokens and attempts to revoke the renewable session; you can also manage access in ChatGPT Settings. An existing OpenAI API provider still requires its own API key.
+
 ### Free LLM providers to get started
 
-Richer is BYOK. A few providers in the kind list offer genuinely free models:
+Richer supports API keys, local Ollama, and ChatGPT subscription sign-in. A few providers in the kind list offer genuinely free models:
 
 | Provider | What's free |
 |---|---|
@@ -99,6 +106,14 @@ xcodebuild -project Richer.xcodeproj -scheme Richer \
   -configuration Release -derivedDataPath build build
 cp -R build/Build/Products/Release/Richer.app /Applications/
 ```
+
+ChatGPT sign-in security and streaming regression tests (offline):
+
+```sh
+tools/tests/run-chatgpt-tests.sh
+```
+
+The browser authorization flow and actual plan eligibility must be verified with your own ChatGPT account.
 
 ### Project layout
 

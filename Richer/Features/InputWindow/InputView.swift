@@ -636,7 +636,6 @@ final class InputWindowController {
     private(set) var viewModel: InputViewModel?
     private var globalMonitor: Any?
     private var isPinned: Bool = false
-    private let presentationLevel: NSWindow.Level = .statusBar
 
     /// True when a panel + viewModel exist (window may be minimized or visible).
     /// Lets callers like the caption bar's "Send to input" know whether to reuse
@@ -653,20 +652,22 @@ final class InputWindowController {
 
     func show(viewModel: InputViewModel, modelContainer: ModelContainer, onOpenHistory: @escaping @MainActor () -> Void) {
         NSLog("[Richer] InputWindowController.show entered")
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
+        // A regular app (including one with the Dock icon enabled) cannot host
+        // this overlay's text-input UI reliably in another app's full-screen Space.
+        // Temporarily act as a utility; restore the Dock preference on dismissal.
+        NSApp.setActivationPolicy(.accessory)
 
         if let existing = panel {
             NSLog("[Richer] reusing existing input panel")
             existing.setFrameOrigin(originNearMouse(for: existing.frame.size))
-            present(existing)
+            existing.presentForTextInput()
             installOutsideMonitorIfNeeded()
             return
         }
         let onPinChanged: (Bool) -> Void = { [weak self] pinned in
             guard let self else { return }
             self.isPinned = pinned
-            self.panel?.level = self.presentationLevel
+            self.panel?.level = InputPanel.presentationLevel
         }
         let view = InputView(
             viewModel: viewModel,
@@ -683,9 +684,9 @@ final class InputWindowController {
         panel.title = "Richer"
         panel.contentView = hosting
         panel.setFrameOrigin(originNearMouse(for: panel.frame.size))
-        present(panel)
         self.panel = panel
         self.viewModel = viewModel
+        panel.presentForTextInput()
         installOutsideMonitorIfNeeded()
         NSLog("[Richer] input panel shown at \(panel.frame)")
     }
@@ -696,10 +697,7 @@ final class InputWindowController {
         panel?.orderOut(nil)
         panel = nil
         viewModel = nil
-        let showDockIcon = UserDefaults.standard.bool(forKey: "richer.showDockIcon")
-        if !showDockIcon {
-            NSApp.setActivationPolicy(.accessory)
-        }
+        restoreActivationPolicy()
     }
 
     /// Hide without destroying: next show() reuses the panel and preserves all state
@@ -708,10 +706,12 @@ final class InputWindowController {
         guard let panel else { return }
         removeOutsideMonitor()
         panel.orderOut(nil)
+        restoreActivationPolicy()
+    }
+
+    private func restoreActivationPolicy() {
         let showDockIcon = UserDefaults.standard.bool(forKey: "richer.showDockIcon")
-        if !showDockIcon {
-            NSApp.setActivationPolicy(.accessory)
-        }
+        NSApp.setActivationPolicy(showDockIcon ? .regular : .accessory)
     }
 
     private func installOutsideMonitorIfNeeded() {
@@ -719,6 +719,10 @@ final class InputWindowController {
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             Task { @MainActor in
                 guard let self, !self.isPinned else { return }
+                // Candidate selection belongs to the input session even though
+                // the IME's candidate window is owned by another process.
+                if let editor = self.panel?.firstResponder as? NSTextView,
+                   editor.hasMarkedText() { return }
                 self.minimize()
             }
         }
@@ -727,19 +731,6 @@ final class InputWindowController {
     private func removeOutsideMonitor() {
         if let m = globalMonitor { NSEvent.removeMonitor(m) }
         globalMonitor = nil
-    }
-
-    private func present(_ panel: InputPanel) {
-        panel.level = presentationLevel
-        panel.deminiaturize(nil)
-        panel.orderFrontRegardless()
-        panel.makeKey()
-
-        DispatchQueue.main.async { [weak panel] in
-            panel?.level = self.presentationLevel
-            panel?.orderFrontRegardless()
-            panel?.makeKey()
-        }
     }
 
     private func originNearMouse(for size: NSSize) -> NSPoint {

@@ -142,7 +142,9 @@ private struct ProviderForm: View {
                         Text(kind.displayName).tag(kind)
                     }
                 }
+                .disabled(chatGPTBusy)
                 .onChange(of: draft.kind) { _, newKind in
+                    draft.apiKey = nil
                     let isDefault = ProviderKind.allCases.contains { draft.baseURL == ProviderConfig.defaultBaseURL(for: $0) }
                     if draft.baseURL.isEmpty || isDefault {
                         draft.baseURL = ProviderConfig.defaultBaseURL(for: newKind)
@@ -156,7 +158,9 @@ private struct ProviderForm: View {
                     }
                 }
                 TextField("Label", text: $draft.label)
-                TextField("Base URL", text: $draft.baseURL)
+                if draft.kind != .chatgpt {
+                    TextField("Base URL", text: $draft.baseURL)
+                }
                 if draft.kind.isLLMKind {
                     TextField("Default model", text: $draft.defaultModel)
                     if !draft.kind.defaultModels.isEmpty {
@@ -176,7 +180,9 @@ private struct ProviderForm: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            if draft.kind == .eudic {
+            if draft.kind == .chatgpt {
+                chatGPTAuthSection
+            } else if draft.kind == .eudic {
                 eudicAuthSection
             } else if draft.kind.requiresAPIKey {
                 Section("Authentication") {
@@ -195,9 +201,95 @@ private struct ProviderForm: View {
                 Spacer()
                 Button("Save") { onSave(draft) }
                     .buttonStyle(.borderedProminent)
+                    .disabled(chatGPTBusy || (draft.kind == .chatgpt && draft.defaultModel.isEmpty))
             }
         }
         .formStyle(.grouped)
+    }
+
+    @State private var chatGPTTask: Task<Void, Never>?
+    @State private var chatGPTBusy = false
+    @State private var chatGPTStatus = ""
+    @State private var chatGPTModels: [ChatGPTModel] = []
+    @State private var chatGPTOperationID = UUID()
+    @State private var chatGPTEmail = ""
+
+    private var chatGPTAuthSection: some View {
+        Section("ChatGPT account") {
+            Text("Use your eligible ChatGPT plan. No API key required. Usage is subject to your plan and app limits.")
+                .font(.caption).foregroundStyle(.secondary)
+            if !chatGPTEmail.isEmpty { Label(chatGPTEmail, systemImage: "person.crop.circle") }
+            HStack {
+                Button("Continue with ChatGPT") { runChatGPTAction(signIn: true) }
+                    .disabled(chatGPTBusy)
+                if chatGPTBusy {
+                    ProgressView().controlSize(.small)
+                    Button("Cancel") { chatGPTTask?.cancel() }
+                } else if !chatGPTEmail.isEmpty {
+                    Button("Refresh models") { runChatGPTAction(signIn: false) }
+                    Button("Sign out") { signOutChatGPT() }
+                }
+            }
+            if !chatGPTModels.isEmpty {
+                Picker("Available models", selection: $draft.defaultModel) {
+                    ForEach(chatGPTModels) { Text($0.displayName).tag($0.id) }
+                }
+            }
+            if !chatGPTStatus.isEmpty { Text(chatGPTStatus).font(.caption).textSelection(.enabled) }
+            Link("Manage ChatGPT usage and access", destination: URL(string: "https://chatgpt.com/#settings")!)
+        }
+        .task(id: draft.id) {
+            chatGPTTask?.cancel()
+            chatGPTOperationID = UUID(); chatGPTBusy = false
+            chatGPTStatus = ""; chatGPTModels = []
+            chatGPTEmail = draft.keychainKeyId.flatMap { ChatGPTAuth.shared.credentials($0) }
+                .flatMap { $0.accessToken == nil ? nil : $0.email } ?? ""
+        }
+        .onDisappear { chatGPTTask?.cancel() }
+    }
+
+    private func runChatGPTAction(signIn: Bool) {
+        let account = draft.keychainKeyId ?? UUID().uuidString
+        draft.keychainKeyId = account
+        let providerID = draft.id
+        let operationID = UUID(); chatGPTOperationID = operationID
+        chatGPTBusy = true; chatGPTStatus = ""
+        chatGPTTask = Task { @MainActor in
+            defer { if chatGPTOperationID == operationID { chatGPTBusy = false } }
+            do {
+                if signIn { try await ChatGPTAuth.shared.signIn(account: account) }
+                try Task.checkCancellation()
+                guard draft.id == providerID, draft.kind == .chatgpt else { return }
+                chatGPTEmail = ChatGPTAuth.shared.credentials(account)?.email ?? ""
+                let models = try await ChatGPTAuth.shared.models(account: account)
+                try Task.checkCancellation()
+                guard draft.id == providerID, draft.kind == .chatgpt else { return }
+                chatGPTModels = models
+                if !models.contains(where: { $0.id == draft.defaultModel }) { draft.defaultModel = models.first?.id ?? "" }
+                chatGPTStatus = String(localized: "Connected. Save this provider and select Set Active to use it.")
+            } catch is CancellationError {
+                if chatGPTOperationID == operationID { chatGPTStatus = String(localized: "Sign-in cancelled.") }
+            } catch {
+                if chatGPTOperationID == operationID { chatGPTStatus = error.localizedDescription }
+            }
+        }
+    }
+
+    private func signOutChatGPT() {
+        guard let account = draft.keychainKeyId else { return }
+        let operationID = UUID(); chatGPTOperationID = operationID
+        chatGPTBusy = true
+        chatGPTTask = Task { @MainActor in
+            defer {
+                if chatGPTOperationID == operationID { chatGPTBusy = false; chatGPTEmail = ""; chatGPTModels = [] }
+            }
+            do {
+                try await ChatGPTAuth.shared.signOut(account: account)
+                if chatGPTOperationID == operationID { chatGPTStatus = String(localized: "Signed out.") }
+            } catch {
+                if chatGPTOperationID == operationID { chatGPTStatus = error.localizedDescription }
+            }
+        }
     }
 
     @State private var eudicTestState: EudicTestState = .idle

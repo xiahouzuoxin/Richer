@@ -4,6 +4,7 @@ import Observation
 enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable {
     case claude
     case openai
+    case chatgpt
     case deepseek
     case qwen
     case zhipu
@@ -16,6 +17,7 @@ enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable {
         switch self {
         case .claude: "Claude (Anthropic)"
         case .openai: "OpenAI"
+        case .chatgpt: String(localized: "ChatGPT (subscription)")
         case .deepseek: "DeepSeek"
         case .qwen: "Qwen (DashScope)"
         case .zhipu: "Zhipu GLM"
@@ -27,7 +29,7 @@ enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable {
 
     var requiresAPIKey: Bool {
         switch self {
-        case .ollama, .eudic: false
+        case .ollama, .eudic, .chatgpt: false
         default: true
         }
     }
@@ -46,6 +48,7 @@ enum ProviderKind: String, Codable, CaseIterable, Identifiable, Sendable {
         switch self {
         case .claude: ["claude-opus-4-7", "claude-sonnet-4-6", "claude-haiku-4-5-20251001"]
         case .openai: ["gpt-4o-mini", "gpt-4o"]
+        case .chatgpt: []
         case .deepseek: ["deepseek-chat", "deepseek-reasoner"]
         case .qwen: ["qwen-turbo", "qwen-plus", "qwen-max"]
         case .zhipu: ["glm-4-flash", "glm-4-plus", "glm-4-air"]   // glm-4-flash is free
@@ -77,7 +80,7 @@ struct ProviderConfig: Codable, Identifiable, Equatable, Sendable {
     static func defaultBaseURL(for kind: ProviderKind) -> String {
         switch kind {
         case .claude: "https://api.anthropic.com/v1"
-        case .openai: "https://api.openai.com/v1"
+        case .openai, .chatgpt: "https://api.openai.com/v1"
         case .deepseek: "https://api.deepseek.com/v1"
         case .qwen: "https://dashscope.aliyuncs.com/compatible-mode/v1"
         case .zhipu: "https://open.bigmodel.cn/api/paas/v4"
@@ -131,6 +134,9 @@ final class ProviderStore {
 
     func makeClient(for provider: ProviderConfig) throws -> LLMClient {
         switch provider.kind {
+        case .chatgpt:
+            guard let account = provider.keychainKeyId else { throw ChatGPTAuthError.message("Sign in with ChatGPT in Settings → Providers first.") }
+            return ChatGPTProvider(account: account)
         case .claude:
             let key = try requireKey(for: provider)
             let url = URL(string: provider.baseURL) ?? URL(string: "https://api.anthropic.com/v1")!

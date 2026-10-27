@@ -11,7 +11,7 @@ struct RicherTextEditor: NSViewRepresentable {
     var onSubmit: () -> Void
 
     func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSTextView.scrollableTextView()
+        let scrollView = RicherInputTextView.scrollableTextView()
         scrollView.drawsBackground = false
         scrollView.borderType = .noBorder
         scrollView.hasVerticalScroller = true
@@ -43,7 +43,9 @@ struct RicherTextEditor: NSViewRepresentable {
 
     func updateNSView(_ nsView: NSScrollView, context: Context) {
         guard let textView = nsView.documentView as? NSTextView else { return }
-        if textView.string != text {
+        // Replacing the backing string discards the IME's marked range and
+        // dismisses its candidate window while the user is still composing.
+        if textView.string != text && !textView.hasMarkedText() {
             textView.string = text
         }
         context.coordinator.parent = self
@@ -66,6 +68,8 @@ struct RicherTextEditor: NSViewRepresentable {
 
         func textView(_ textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
             if commandSelector == #selector(NSResponder.insertNewline(_:)) {
+                // Return confirms an IME candidate before it can submit a card.
+                if textView.hasMarkedText() { return false }
                 let shiftPressed = NSApp.currentEvent?.modifierFlags.contains(.shift) ?? false
                 if shiftPressed {
                     textView.insertNewlineIgnoringFieldEditor(nil)
@@ -76,6 +80,16 @@ struct RicherTextEditor: NSViewRepresentable {
             }
             return false
         }
+    }
+}
+
+/// Report the real overlay level to the text input system so it can place its
+/// candidate UI above Richer, including when another app owns the active Space.
+final class RicherInputTextView: NSTextView {
+    override var needsPanelToBecomeKey: Bool { true }
+
+    override func windowLevel() -> Int {
+        window?.level.rawValue ?? NSWindow.Level.normal.rawValue
     }
 }
 

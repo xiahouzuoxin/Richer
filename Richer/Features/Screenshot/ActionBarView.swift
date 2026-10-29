@@ -5,7 +5,7 @@ struct ActionBarView: View {
     var onAction: (Action) -> Void
 
     enum Action {
-        case refine, translate, dictionary, copy
+        case refine, translate, reply, dictionary, copy
     }
 
     var body: some View {
@@ -13,8 +13,9 @@ struct ActionBarView: View {
             previewLine
             Divider().opacity(0.6)
             HStack(spacing: 8) {
-                actionButton(.refine, label: "Refine", systemImage: "wand.and.stars")
                 actionButton(.translate, label: "Translate", systemImage: "globe")
+                actionButton(.refine, label: "Refine", systemImage: "wand.and.stars")
+                actionButton(.reply, label: "Reply", systemImage: "arrowshape.turn.up.left")
                 actionButton(.dictionary, label: "Dictionary", systemImage: "book")
                 actionButton(.copy, label: "Copy", systemImage: "doc.on.doc")
             }

@@ -4,6 +4,7 @@ import SwiftData
 enum HistoryKind: String, Codable {
     case refine
     case translate
+    case reply
     case dictionary
 }
 
@@ -14,10 +15,18 @@ final class HistoryEntry {
     var kindRaw: String
     var originalText: String
     var resultText: String
-    /// For refine: RefineMode.rawValue. For translate: ISO language code.
+    /// Refine operation identifier; translate uses an ISO language code.
     var modeOrTargetLang: String
     var providerLabel: String
     var modelID: String
+    var refineOptionsData: Data?
+    var replyContext: String?
+
+    var refineOptions: RefineOptions {
+        if let data = refineOptionsData,
+           let options = try? JSONDecoder().decode(RefineOptions.self, from: data) { return options }
+        return RefineOptions(storedMode: modeOrTargetLang)
+    }
 
     var kind: HistoryKind {
         get { HistoryKind(rawValue: kindRaw) ?? .refine }

@@ -6,6 +6,8 @@ import SwiftData
 @MainActor
 final class CardViewModel {
     let card: ActionCard
+    var refineOptions: RefineOptions = .polish
+    var replyContext = ""
     var isExpanded: Bool = false
     var result: ActionResult = .empty
     var isStreaming: Bool = false
@@ -15,29 +17,42 @@ final class CardViewModel {
     /// Hash of the input that produced the current `result`. Used to detect staleness.
     var lastRunInputHash: Int?
 
-    /// Convenience for tests / clients that only consume streamed text.
     var resultText: String { result.asText }
 
     private let providerStore: ProviderStore
-    private let refineModeStore: RefineModeStore
+    private let refinePromptStore: RefinePromptStore
     private let translateSettings: TranslateSettings
+    private let replySettings: ReplySettings
     private var streamTask: Task<Void, Never>?
 
     init(
         card: ActionCard,
         providerStore: ProviderStore,
-        refineModeStore: RefineModeStore,
-        translateSettings: TranslateSettings
+        refinePromptStore: RefinePromptStore,
+        translateSettings: TranslateSettings,
+        replySettings: ReplySettings
     ) {
         self.card = card
+        if case .refine(let options) = card.action { self.refineOptions = options }
         self.providerStore = providerStore
-        self.refineModeStore = refineModeStore
+        self.refinePromptStore = refinePromptStore
         self.translateSettings = translateSettings
+        self.replySettings = replySettings
     }
 
     var headerLabel: String {
         let providerLabelResolved = providerStore.providers.first { $0.id == card.providerID }?.label ?? String(localized: "Unknown")
-        return "\(card.action.label) · \(providerLabelResolved)"
+        return "\(refineLabel) · \(providerLabelResolved)"
+    }
+
+    var actionSymbol: String {
+        if case .refine = card.action { return refineOptions.symbol }
+        return card.action.symbol
+    }
+
+    private var refineLabel: String {
+        if case .refine = card.action { return refineOptions.label }
+        return card.action.label
     }
 
     var isProviderMissing: Bool {
@@ -77,7 +92,7 @@ final class CardViewModel {
     func run(input: String, targetOverride: String?, sourceOverride: String? = nil, modelContext: ModelContext) {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            errorMessage = "Type something to refine or translate."
+            errorMessage = String(localized: "Type something to refine, translate, or reply to.")
             return
         }
         cancel()
@@ -86,7 +101,10 @@ final class CardViewModel {
         isStreaming = true
         lastRunInputHash = trimmed.hashValue
 
+        let capturedOptions = refineOptions
+        let capturedReplyContext = replyContext
         streamTask = Task { @MainActor [self] in
+            guard !Task.isCancelled else { return }
             do {
                 guard let provider = providerStore.providers.first(where: { $0.id == card.providerID }) else {
                     throw LLMError.noActiveProvider
@@ -94,19 +112,19 @@ final class CardViewModel {
                 providerLabel = provider.label
 
                 switch card.action {
-                case .refine(let mode):
+                case .refine:
                     result = .streamingText("")
-                    let service = RefineService(providerStore: providerStore, modeStore: refineModeStore)
-                    let stream = try service.stream(text: trimmed, mode: mode, provider: provider)
+                    let service = RefineService(providerStore: providerStore, promptStore: refinePromptStore)
+                    let stream = try service.stream(text: trimmed, options: capturedOptions, provider: provider)
                     for try await delta in stream {
-                        if Task.isCancelled { break }
+                        if Task.isCancelled { return }
                         result = .streamingText(result.streamingText + delta.text)
                     }
                     if !Task.isCancelled {
                         HistoryWriter.record(
                             in: modelContext, kind: .refine,
                             original: trimmed, result: result.streamingText,
-                            modeOrTargetLang: mode.rawValue, provider: provider
+                            modeOrTargetLang: "polish", provider: provider, refineOptions: capturedOptions
                         )
                     }
                 case .translate:
@@ -115,7 +133,7 @@ final class CardViewModel {
                     let (stream, target) = try service.stream(text: trimmed, provider: provider, targetOverride: targetOverride, sourceOverride: sourceOverride)
                     resolvedTargetLanguage = target
                     for try await delta in stream {
-                        if Task.isCancelled { break }
+                        if Task.isCancelled { return }
                         result = .streamingText(result.streamingText + delta.text)
                     }
                     if !Task.isCancelled {
@@ -124,6 +142,19 @@ final class CardViewModel {
                             original: trimmed, result: result.streamingText,
                             modeOrTargetLang: target, provider: provider
                         )
+                    }
+                case .reply:
+                    result = .streamingText("")
+                    let stream = try ReplyService(providerStore: providerStore, settings: replySettings).stream(
+                        message: trimmed, context: capturedReplyContext, provider: provider)
+                    for try await delta in stream {
+                        if Task.isCancelled { return }
+                        result = .streamingText(result.streamingText + delta.text)
+                    }
+                    if !Task.isCancelled {
+                        HistoryWriter.record(in: modelContext, kind: .reply, original: trimmed,
+                            result: result.streamingText, modeOrTargetLang: "reply", provider: provider,
+                            replyContext: capturedReplyContext)
                     }
                 case .dictionary:
                     let service = DictionaryService(providerStore: providerStore)
@@ -142,6 +173,7 @@ final class CardViewModel {
                     errorMessage = error.localizedDescription
                 }
             }
+            guard !Task.isCancelled else { return }
             isStreaming = false
         }
     }

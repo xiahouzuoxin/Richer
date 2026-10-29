@@ -56,6 +56,7 @@ struct CardsSettingsView: View {
                     cardStore.update(updated)
                 }
                 .frame(maxWidth: .infinity)
+                .id(card.id)
             } else {
                 VStack {
                     Spacer()
@@ -117,28 +118,30 @@ private struct CardListRow: View {
 }
 
 private struct CardEditor: View {
+    @Environment(Coordinator.self) private var coordinator
     let card: ActionCard
     let providers: [ProviderConfig]
     let onSave: (ActionCard) -> Void
 
     @State private var providerID: UUID
     @State private var actionTag: ActionTag
-    @State private var refineMode: RefineMode
+    @State private var refineOptions: RefineOptions
 
     enum ActionTag: String, CaseIterable, Identifiable {
-        case refine, translate, dictionary
+        case translate, refine, reply, dictionary
         var id: String { rawValue }
         var label: String {
             switch self {
-            case .refine: "Refine"
-            case .translate: "Translate"
-            case .dictionary: "Dictionary"
+            case .refine: String(localized: "Refine")
+            case .translate: String(localized: "Translate")
+            case .reply: String(localized: "Reply")
+            case .dictionary: String(localized: "Dictionary")
             }
         }
 
         func compatibleProviderKinds(_ kind: ProviderKind) -> Bool {
             switch self {
-            case .refine, .translate: kind.isLLMKind
+            case .refine, .translate, .reply: kind.isLLMKind
             case .dictionary: kind.isDictionaryKind
             }
         }
@@ -152,13 +155,16 @@ private struct CardEditor: View {
         switch card.action {
         case .refine(let mode):
             _actionTag = State(initialValue: .refine)
-            _refineMode = State(initialValue: mode)
+            _refineOptions = State(initialValue: mode)
         case .translate:
             _actionTag = State(initialValue: .translate)
-            _refineMode = State(initialValue: .polish)
+            _refineOptions = State(initialValue: .polish)
+        case .reply:
+            _actionTag = State(initialValue: .reply)
+            _refineOptions = State(initialValue: .polish)
         case .dictionary:
             _actionTag = State(initialValue: .dictionary)
-            _refineMode = State(initialValue: .polish)
+            _refineOptions = State(initialValue: .polish)
         }
     }
 
@@ -172,7 +178,7 @@ private struct CardEditor: View {
                 Picker("Action", selection: $actionTag) {
                     ForEach(ActionTag.allCases) { Text($0.label).tag($0) }
                 }
-                .pickerStyle(.segmented)
+                .pickerStyle(.menu)
                 .onChange(of: actionTag) { _, newTag in
                     // If the current provider isn't compatible with the new action,
                     // pick the first compatible one (or leave unchanged if none).
@@ -184,9 +190,7 @@ private struct CardEditor: View {
                 }
 
                 if actionTag == .refine {
-                    Picker("Mode", selection: $refineMode) {
-                        ForEach(RefineMode.allCases) { Text($0.label).tag($0) }
-                    }
+                    RefineOptionsView(options: $refineOptions)
                 }
             }
             Section("Provider") {
@@ -212,11 +216,12 @@ private struct CardEditor: View {
                 Button("Save") {
                     let action: ActionKind
                     switch actionTag {
-                    case .refine: action = .refine(refineMode)
+                    case .refine: action = .refine(refineOptions)
                     case .translate: action = .translate
+                    case .reply: action = .reply
                     case .dictionary: action = .dictionary
                     }
-                    onSave(ActionCard(id: card.id, providerID: providerID, action: action))
+                    onSave(ActionCard(id: card.id, providerID: providerID, action: action, enabled: card.enabled))
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(filteredProviders.isEmpty)

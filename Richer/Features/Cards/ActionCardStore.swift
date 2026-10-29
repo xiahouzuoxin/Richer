@@ -36,8 +36,8 @@ final class ActionCardStore {
         guard cards.isEmpty else { return }
         cards = [
             ActionCard(providerID: providerID, action: .refine(.polish)),
-            ActionCard(providerID: providerID, action: .refine(.grammar)),
-            ActionCard(providerID: providerID, action: .translate)
+            ActionCard(providerID: providerID, action: .translate),
+            ActionCard(providerID: providerID, action: .reply)
         ]
         save()
     }
@@ -53,8 +53,8 @@ final class ActionCardStore {
         var candidates: [(UUID, ActionKind)] = []
         if let llmID = llmProvider?.id {
             candidates.append((llmID, .refine(.polish)))
-            candidates.append((llmID, .refine(.grammar)))
             candidates.append((llmID, .translate))
+            candidates.append((llmID, .reply))
         }
         if let dictID = dictProvider?.id {
             candidates.append((dictID, .dictionary))
@@ -92,6 +92,7 @@ private struct CardSignature: Hashable {
         switch action {
         case .refine(let mode): hasher.combine("refine"); hasher.combine(mode)
         case .translate: hasher.combine("translate")
+        case .reply: hasher.combine("reply")
         case .dictionary: hasher.combine("dictionary")
         }
     }

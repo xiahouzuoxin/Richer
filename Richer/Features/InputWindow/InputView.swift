@@ -28,21 +28,24 @@ final class InputViewModel {
     private var sttCommittedSuffix: String = ""
 
     let providerStore: ProviderStore
-    let refineModeStore: RefineModeStore
+    let refinePromptStore: RefinePromptStore
     let translateSettings: TranslateSettings
+    let replySettings: ReplySettings
     let actionCardStore: ActionCardStore
 
     private(set) var cardViewModels: [UUID: CardViewModel] = [:]
 
     init(
         providerStore: ProviderStore,
-        refineModeStore: RefineModeStore,
+        refinePromptStore: RefinePromptStore,
         translateSettings: TranslateSettings,
+        replySettings: ReplySettings,
         actionCardStore: ActionCardStore
     ) {
         self.providerStore = providerStore
-        self.refineModeStore = refineModeStore
+        self.refinePromptStore = refinePromptStore
         self.translateSettings = translateSettings
+        self.replySettings = replySettings
         self.actionCardStore = actionCardStore
         rebuildViewModels()
     }
@@ -177,8 +180,9 @@ final class InputViewModel {
                 next[card.id] = CardViewModel(
                     card: card,
                     providerStore: providerStore,
-                    refineModeStore: refineModeStore,
-                    translateSettings: translateSettings
+                    refinePromptStore: refinePromptStore,
+                    translateSettings: translateSettings,
+                    replySettings: replySettings
                 )
             }
         }

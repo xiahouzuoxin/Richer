@@ -4,8 +4,9 @@ A free, Bob-style **macOS translation & writing assistant** that lives in the me
 
 ## Features
 
-- **Refine** — Grammar · Polish · Professional · Concise · Casual
 - **Translate** — auto-detect source, configurable primary/secondary languages
+- **Refine** — Polish includes grammar, spelling, and punctuation fixes; combine Professional/Casual tone with Concise or Expand length. Popup and input cards share the same controls.
+- **Reply** — select a question or message and draft a ready-to-send answer, with optional reply notes. Available in the popup, input cards, OCR actions, and the `⌥⇧P` selection shortcut. Customize its concise, polite, accurate default prompt in **Settings → Writing → Reply**.
 - **Dictionary** — Eudic + macOS dictionary, with one-click "add to wordbook"
 - **Read aloud (TTS)** — Apple's system voices on any input or result
 - **Dictate (STT)** — live on-device speech-to-text in the input window
@@ -29,8 +30,9 @@ Highlight text in any app, hit a hotkey, and a popup appears next to the selecti
 
 | Hotkey | Action |
 |---|---|
-| `⌥⇧R` | Refine selection (popup) |
 | `⌥⇧T` | Translate selection (popup) |
+| `⌥⇧R` | Refine selection (popup) |
+| `⌥⇧P` | Reply to selection (popup) |
 | `⌥⇧D` | Look up selection (popup) |
 | `⌥⇧S` | Capture a screen region, OCR, then pick an action |
 | `⌥⇧C` | Toggle live captions |
@@ -78,7 +80,7 @@ Richer supports API keys, local Ollama, and ChatGPT subscription sign-in. A few 
 2. **Settings → Providers** — add an LLM provider; key is stored in the macOS Keychain.
 3. **Settings → Cards** — click **Suggested** to seed three defaults, or add your own.
 4. **Grant permissions** when prompted:
-   - **Accessibility** — for `⌥⇧R / ⌥⇧T / ⌥⇧D` to read the current selection.
+   - **Accessibility** — for `⌥⇧T / ⌥⇧R / ⌥⇧P / ⌥⇧D` to read the current selection.
    - **Screen Recording** — for `⌥⇧S` OCR. *Restart Richer after granting.*
    - **Microphone + Speech Recognition** — for dictation and live captions.
 

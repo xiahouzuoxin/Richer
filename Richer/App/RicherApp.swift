@@ -47,6 +47,11 @@ struct MenuBarContent: View {
                 action: nil
             )
             menuRow(
+                title: "Reply to Selection",
+                shortcut: KeyboardShortcuts.getShortcut(for: .selectionReply),
+                action: nil
+            )
+            menuRow(
                 title: "Look Up Selection",
                 shortcut: KeyboardShortcuts.getShortcut(for: .selectionDictionary),
                 action: nil

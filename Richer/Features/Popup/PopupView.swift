@@ -12,12 +12,27 @@ struct PopupView: View {
             header
             Divider()
             actionBar
+            if viewModel.intent == .refine {
+                RefineOptionsView(options: Binding(
+                    get: { viewModel.refineOptions },
+                    set: { viewModel.selectOptions($0, modelContext: modelContext) }
+                ), compact: true)
+                .padding(.horizontal, 12)
+                .padding(.bottom, 8)
+            }
+            if viewModel.intent == .reply {
+                ReplyContextView(context: $viewModel.replyContext) {
+                    viewModel.run(modelContext: modelContext)
+                }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 8)
+            }
             Divider()
             content
         }
         .background(.regularMaterial)
         .clipShape(.rect(cornerRadius: 12))
-        .frame(width: 460)
+        .frame(minWidth: 620, maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             viewModel.runIfNeeded(modelContext: modelContext)
         }
@@ -34,6 +49,8 @@ struct PopupView: View {
                 .font(.subheadline.weight(.medium))
             if !viewModel.providerLabelInUse.isEmpty {
                 Text("• \(viewModel.providerLabelInUse)")
+                    .lineLimit(1)
+                    .truncationMode(.middle)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -54,6 +71,7 @@ struct PopupView: View {
         switch viewModel.intent {
         case .refine: "wand.and.stars"
         case .translate: "globe"
+        case .reply: "arrowshape.turn.up.left"
         case .dictionary: "book"
         }
     }
@@ -62,6 +80,7 @@ struct PopupView: View {
         switch viewModel.intent {
         case .refine: "Richer • Refine"
         case .translate: "Richer • Translate"
+        case .reply: "Richer • Reply"
         case .dictionary: "Richer • Dictionary"
         }
     }
@@ -72,25 +91,16 @@ struct PopupView: View {
                 get: { viewModel.intent },
                 set: { newValue in viewModel.switchTo(newValue, modelContext: modelContext) }
             )) {
-                Text("Refine").tag(WriteIntent.refine)
                 Text("Translate").tag(WriteIntent.translate)
+                Text("Refine").tag(WriteIntent.refine)
+                Text("Reply").tag(WriteIntent.reply)
                 Text("Dictionary").tag(WriteIntent.dictionary)
             }
             .pickerStyle(.segmented)
-            .frame(width: 240)
+            .frame(width: 300)
+            .layoutPriority(1)
 
-            if viewModel.intent == .refine {
-                ForEach(RefineMode.allCases) { mode in
-                    Button {
-                        viewModel.selectMode(mode, modelContext: modelContext)
-                    } label: {
-                        Image(systemName: mode.symbol)
-                            .help(mode.label)
-                    }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(viewModel.selectedRefineMode == mode ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
-                }
-            } else if viewModel.intent == .translate {
+            if viewModel.intent == .translate {
                 translateLanguagePickers
             }
 
@@ -117,7 +127,7 @@ struct PopupView: View {
             }
             .pickerStyle(.menu)
             .labelsHidden()
-            .fixedSize()
+            .frame(minWidth: 90, maxWidth: .infinity)
 
             Image(systemName: "arrow.right")
                 .font(.system(size: 10, weight: .semibold))
@@ -134,7 +144,7 @@ struct PopupView: View {
             }
             .pickerStyle(.menu)
             .labelsHidden()
-            .fixedSize()
+            .frame(minWidth: 90, maxWidth: .infinity)
         }
     }
 
@@ -149,7 +159,7 @@ struct PopupView: View {
     @ViewBuilder
     private var originalSection: some View {
         if !viewModel.originalText.isEmpty, viewModel.intent != .dictionary {
-            Text("Original")
+            Text(viewModel.intent == .reply ? LocalizedStringKey("Incoming message") : LocalizedStringKey("Original"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
             ScrollView {
@@ -234,6 +244,7 @@ struct PopupView: View {
         switch viewModel.intent {
         case .refine: "Refined"
         case .translate: "Translation"
+        case .reply: "Reply"
         case .dictionary: "Definition"
         }
     }

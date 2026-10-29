@@ -4,6 +4,7 @@ import KeyboardShortcuts
 extension KeyboardShortcuts.Name {
     static let selectionRefine = Self("selectionRefine", default: .init(.r, modifiers: [.option, .shift]))
     static let selectionTranslate = Self("selectionTranslate", default: .init(.t, modifiers: [.option, .shift]))
+    static let selectionReply = Self("selectionReply", default: .init(.p, modifiers: [.option, .shift]))
     static let selectionDictionary = Self("selectionDictionary", default: .init(.d, modifiers: [.option, .shift]))
     static let screenshotOCR = Self("screenshotOCR", default: .init(.s, modifiers: [.option, .shift]))
     static let captionBar = Self("captionBar", default: .init(.c, modifiers: [.option, .shift]))
@@ -15,6 +16,7 @@ final class HotkeyManager {
     func register(
         onSelectionRefine: @escaping @MainActor () -> Void,
         onSelectionTranslate: @escaping @MainActor () -> Void,
+        onSelectionReply: @escaping @MainActor () -> Void,
         onSelectionDictionary: @escaping @MainActor () -> Void,
         onScreenshotOCR: @escaping @MainActor () -> Void,
         onCaptionBar: @escaping @MainActor () -> Void,
@@ -22,6 +24,7 @@ final class HotkeyManager {
     ) {
         KeyboardShortcuts.onKeyDown(for: .selectionRefine) { onSelectionRefine() }
         KeyboardShortcuts.onKeyDown(for: .selectionTranslate) { onSelectionTranslate() }
+        KeyboardShortcuts.onKeyDown(for: .selectionReply) { onSelectionReply() }
         KeyboardShortcuts.onKeyDown(for: .selectionDictionary) { onSelectionDictionary() }
         KeyboardShortcuts.onKeyDown(for: .screenshotOCR) { onScreenshotOCR() }
         KeyboardShortcuts.onKeyDown(for: .captionBar) { onCaptionBar() }

@@ -21,7 +21,7 @@ final class PopupWindowController {
         let hosting = NSHostingView(rootView: view)
         hosting.translatesAutoresizingMaskIntoConstraints = false
 
-        let panelRect = NSRect(x: 0, y: 0, width: 460, height: 360)
+        let panelRect = NSRect(x: 0, y: 0, width: 620, height: 380)
         let panel = PopupPanel(contentRect: panelRect, canBecomeKey: true)
 
         let container = NSView(frame: panelRect)
@@ -33,6 +33,7 @@ final class PopupWindowController {
             hosting.topAnchor.constraint(equalTo: container.topAnchor),
             hosting.bottomAnchor.constraint(equalTo: container.bottomAnchor)
         ])
+        panel.contentMinSize = NSSize(width: 620, height: 320)
         panel.contentView = container
 
         let placed = clamp(origin: point, panel: panel)

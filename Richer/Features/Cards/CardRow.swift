@@ -10,7 +10,7 @@ struct CardRow: View {
         VStack(alignment: .leading, spacing: 0) {
             Button(action: onTap) {
                 HStack(spacing: 10) {
-                    Image(systemName: viewModel.card.action.symbol)
+                    Image(systemName: viewModel.actionSymbol)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.tint)
                         .frame(width: 22, height: 22)
@@ -67,6 +67,15 @@ struct CardRow: View {
 
     private var textBody: some View {
         VStack(alignment: .leading, spacing: 6) {
+            if case .refine = viewModel.card.action {
+                RefineOptionsView(options: Binding(
+                    get: { viewModel.refineOptions },
+                    set: { viewModel.refineOptions = $0; onRerun() }
+                ), compact: true)
+            }
+            if case .reply = viewModel.card.action {
+                ReplyContextView(context: $viewModel.replyContext, onGenerate: onRerun)
+            }
             if let target = viewModel.resolvedTargetLanguage {
                 Text("→ \(LanguageDetector.displayName(for: target))")
                     .font(.caption)

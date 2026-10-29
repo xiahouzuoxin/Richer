@@ -68,6 +68,9 @@ private struct HistoryRow: View {
             Text(entry.originalText)
                 .lineLimit(2)
                 .foregroundStyle(.secondary)
+            if entry.kind == .reply, let notes = entry.replyContext, !notes.isEmpty {
+                Text(notes).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+            }
             Text(entry.resultText)
                 .lineLimit(3)
         }
@@ -78,13 +81,15 @@ private struct HistoryRow: View {
         switch entry.kind {
         case .refine: "wand.and.stars"
         case .translate: "globe"
+        case .reply: "arrowshape.turn.up.left"
         case .dictionary: "book"
         }
     }
 
     private var kindLabel: String {
         switch entry.kind {
-        case .refine: String(localized: "Refine • \(entry.modeOrTargetLang)")
+        case .refine: String(localized: "Refine • \(entry.refineOptions.label)")
+        case .reply: String(localized: "Reply")
         case .translate: String(localized: "Translate → \(entry.modeOrTargetLang)")
         case .dictionary: String(localized: "Dictionary • \(entry.modeOrTargetLang)")
         }

@@ -5,8 +5,9 @@ struct HotkeysSettingsView: View {
     var body: some View {
         Form {
             Section("Selection") {
-                KeyboardShortcuts.Recorder("Refine selection", name: .selectionRefine)
                 KeyboardShortcuts.Recorder("Translate selection", name: .selectionTranslate)
+                KeyboardShortcuts.Recorder("Refine selection", name: .selectionRefine)
+                KeyboardShortcuts.Recorder("Reply to selection", name: .selectionReply)
                 KeyboardShortcuts.Recorder("Look up selection", name: .selectionDictionary)
             }
             Section("Screen") {

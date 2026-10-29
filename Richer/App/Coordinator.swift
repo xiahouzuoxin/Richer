@@ -5,6 +5,7 @@ import SwiftData
 enum WriteIntent: Sendable, Equatable {
     case refine
     case translate
+    case reply
     case dictionary
 }
 
@@ -19,8 +20,9 @@ final class Coordinator {
     private let regionController = ScreenshotRegionController()
     private let actionBarController = ActionBarController()
     let providerStore = ProviderStore()
-    let refineModeStore = RefineModeStore()
+    let refinePromptStore = RefinePromptStore()
     let translateSettings = TranslateSettings()
+    let replySettings = ReplySettings()
     let actionCardStore = ActionCardStore()
     var modelContainer: ModelContainer?
 
@@ -28,6 +30,7 @@ final class Coordinator {
         hotkeys.register(
             onSelectionRefine: { [weak self] in self?.handleSelectionHotkey(intent: .refine) },
             onSelectionTranslate: { [weak self] in self?.handleSelectionHotkey(intent: .translate) },
+            onSelectionReply: { [weak self] in self?.handleSelectionHotkey(intent: .reply) },
             onSelectionDictionary: { [weak self] in self?.handleSelectionHotkey(intent: .dictionary) },
             onScreenshotOCR: { [weak self] in self?.handleScreenshotOCR() },
             onCaptionBar: { [weak self] in self?.openCaptionBar() },
@@ -90,6 +93,8 @@ final class Coordinator {
                         self.openPopup(with: text, intent: .refine)
                     case .translate:
                         self.openPopup(with: text, intent: .translate)
+                    case .reply:
+                        self.openPopup(with: text, intent: .reply)
                     case .dictionary:
                         self.openPopup(with: text, intent: .dictionary)
                     case .copy:
@@ -103,7 +108,7 @@ final class Coordinator {
         }
     }
 
-    func openPopup(with text: String, intent: WriteIntent, errorMessage: String? = nil) {
+    func openPopup(with text: String, intent: WriteIntent, errorMessage: String? = nil, refineOptions: RefineOptions = .polish, replyContext: String = "") {
         guard let modelContainer else {
             NSLog("[Richer] openPopup aborted: modelContainer not set")
             return
@@ -112,9 +117,12 @@ final class Coordinator {
             originalText: text,
             intent: intent,
             providerStore: providerStore,
-            refineModeStore: refineModeStore,
-            translateSettings: translateSettings
+            refinePromptStore: refinePromptStore,
+            translateSettings: translateSettings,
+            replySettings: replySettings
         )
+        viewModel.refineOptions = refineOptions
+        viewModel.replyContext = replyContext
         if let errorMessage {
             viewModel.errorMessage = errorMessage
         }
@@ -137,8 +145,9 @@ final class Coordinator {
             // the parameter is ignored in the reuse path. Still, satisfy the API.
             let viewModel = inputController.viewModel ?? InputViewModel(
                 providerStore: providerStore,
-                refineModeStore: refineModeStore,
+                refinePromptStore: refinePromptStore,
                 translateSettings: translateSettings,
+                replySettings: replySettings,
                 actionCardStore: actionCardStore
             )
             inputController.show(
@@ -150,8 +159,9 @@ final class Coordinator {
         }
         let viewModel = InputViewModel(
             providerStore: providerStore,
-            refineModeStore: refineModeStore,
+            refinePromptStore: refinePromptStore,
             translateSettings: translateSettings,
+            replySettings: replySettings,
             actionCardStore: actionCardStore
         )
         if let prefilledText, !prefilledText.isEmpty {
@@ -180,9 +190,11 @@ final class Coordinator {
     func rerun(entry: HistoryEntry) {
         switch entry.kind {
         case .refine:
-            openPopup(with: entry.originalText, intent: .refine)
+            openPopup(with: entry.originalText, intent: .refine, refineOptions: entry.refineOptions)
         case .translate:
             openPopup(with: entry.originalText, intent: .translate)
+        case .reply:
+            openPopup(with: entry.originalText, intent: .reply, replyContext: entry.replyContext ?? "")
         case .dictionary:
             openPopup(with: entry.originalText, intent: .dictionary)
         }

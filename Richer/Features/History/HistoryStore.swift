@@ -9,7 +9,9 @@ enum HistoryWriter {
         original: String,
         result: String,
         modeOrTargetLang: String,
-        provider: ProviderConfig
+        provider: ProviderConfig,
+        refineOptions: RefineOptions? = nil,
+        replyContext: String? = nil
     ) {
         let entry = HistoryEntry(
             kind: kind,
@@ -19,6 +21,10 @@ enum HistoryWriter {
             providerLabel: provider.label,
             modelID: provider.defaultModel
         )
+        if let refineOptions {
+            entry.refineOptionsData = try? JSONEncoder().encode(refineOptions)
+        }
+        entry.replyContext = replyContext
         context.insert(entry)
         try? context.save()
     }

@@ -27,7 +27,7 @@ final class ActionBarController {
 
         // Size: SwiftUI provides intrinsic sizing; cap width and let height auto-fit.
         let intrinsic = hosting.fittingSize
-        let width = min(max(intrinsic.width, 360), 520)
+        let width = min(max(intrinsic.width, 360), 600)
         let height = max(intrinsic.height, 70)
         let panelRect = NSRect(x: 0, y: 0, width: width, height: height)
         let panel = ActionBarPanel(contentRect: panelRect)

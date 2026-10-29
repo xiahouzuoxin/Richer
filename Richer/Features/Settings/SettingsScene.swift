@@ -14,11 +14,8 @@ struct SettingsScene: View {
             CardsSettingsView()
                 .tabItem { Label("Cards", systemImage: "rectangle.stack") }
 
-            RefineModesSettingsView()
-                .tabItem { Label("Refine", systemImage: "wand.and.stars") }
-
-            TranslateSettingsView()
-                .tabItem { Label("Translate", systemImage: "globe") }
+            WritingSettingsView()
+                .tabItem { Label("Writing", systemImage: "text.bubble") }
 
             HotkeysSettingsView()
                 .tabItem { Label("Hotkeys", systemImage: "keyboard") }

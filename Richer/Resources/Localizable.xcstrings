@@ -1,6 +1,470 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+"Writing": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Writing"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "写作"
+      }
+    }
+  }
+},
+"Reply prompt": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Reply prompt"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "回复提示词"
+      }
+    }
+  }
+},
+"Saved": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Saved"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "已保存"
+      }
+    }
+  }
+},
+"Replies are concise, polite, and accurate by default. Customize the writing instructions below; reply notes can guide each individual answer.": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Replies are concise, polite, and accurate by default. Customize the writing instructions below; reply notes can guide each individual answer."
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "回复默认简洁、礼貌、准确。可在下方自定义写作指令，并通过回复要点补充每次回复的要求。"
+      }
+    }
+  }
+},
+"These instructions apply to both selection popups and input cards. Reply drafts use the message's language unless your reply notes request another language.": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "These instructions apply to both selection popups and input cards. Reply drafts use the message's language unless your reply notes request another language."
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "这些指令同时用于选中内容弹窗和输入卡片。回复默认使用对方消息的语言，也可在回复要点中指定其他语言。"
+      }
+    }
+  }
+},
+"Expand": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Expand"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "扩写"
+      }
+    }
+  }
+},
+"Length: Expand": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Length: Expand"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "长度：扩写"
+      }
+    }
+  }
+},
+"Reply": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Reply"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "回复"
+      }
+    }
+  }
+},
+"Richer • Reply": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Richer • Reply"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Richer • 回复"
+      }
+    }
+  }
+},
+"Incoming message": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Incoming message"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "对方的消息"
+      }
+    }
+  }
+},
+"Reply notes (optional)": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Reply notes (optional)"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "回复要点（可选）"
+      }
+    }
+  }
+},
+"Generate reply": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Generate reply"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "生成回复"
+      }
+    }
+  }
+},
+"For example: politely decline, or say Friday works for me.": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "For example: politely decline, or say Friday works for me."
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "例如：礼貌拒绝，或告诉对方周五可以。"
+      }
+    }
+  }
+},
+"Reply to selection": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Reply to selection"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "回复选中内容"
+      }
+    }
+  }
+},
+"Reply to Selection": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Reply to Selection"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "回复选中内容"
+      }
+    }
+  }
+},
+"Type something to refine, translate, or reply to.": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Type something to refine, translate, or reply to."
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "请输入要润色、翻译或回复的内容。"
+      }
+    }
+  }
+},
+"Adjust": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Adjust"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "调整"
+      }
+    }
+  }
+},
+"Polish fixes grammar, spelling, and punctuation while improving clarity and flow. Tone and length adjustments can be combined.": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Polish fixes grammar, spelling, and punctuation while improving clarity and flow. Tone and length adjustments can be combined."
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "润色会修正语法、拼写和标点错误，并改善表达的清晰度与流畅度。语气与长度调整可以组合使用。"
+      }
+    }
+  }
+},
+"Base: Polish": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Base: Polish"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "基础：润色"
+      }
+    }
+  }
+},
+"Tone": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Tone"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "语气"
+      }
+    }
+  }
+},
+"Length": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Length"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "长度"
+      }
+    }
+  }
+},
+"Adjust tone and length": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Adjust tone and length"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "调整语气和长度"
+      }
+    }
+  }
+},
+"Reset": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Reset"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "重置"
+      }
+    }
+  }
+},
+"Prompt component": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Prompt component"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "提示词组成部分"
+      }
+    }
+  }
+},
+"Writing instruction": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Writing instruction"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "写作指令"
+      }
+    }
+  }
+},
+"Selected instructions are combined automatically. Input text and shared language, meaning, and output rules are added by Refine.": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Selected instructions are combined automatically. Input text and shared language, meaning, and output rules are added by Refine."
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "所选指令会自动组合。Refine 会加入待编辑文本，以及保留语言、原意和输出格式的通用规则。"
+      }
+    }
+  }
+},
+"Tone: Professional": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Tone: Professional"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "语气：专业"
+      }
+    }
+  }
+},
+"Tone: Casual": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Tone: Casual"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "语气：随意"
+      }
+    }
+  }
+},
+"Length: Concise": {
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Length: Concise"
+      }
+    },
+    "zh-Hans": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "长度：简洁"
+      }
+    }
+  }
+},
     "Signed out.": {
       "localizations": {
         "en": {
@@ -926,24 +1390,7 @@
         }
       }
     },
-    "Grammar Fix" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grammar Fix"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "语法修正"
-          }
-        }
-      }
-    },
-    "Granted — capture & lookup region enabled." : {
+        "Granted — capture & lookup region enabled." : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {

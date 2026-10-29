@@ -7,7 +7,8 @@ import SwiftData
 final class PopupViewModel {
     let originalText: String
     var intent: WriteIntent
-    var selectedRefineMode: RefineMode = .grammar
+    var refineOptions: RefineOptions = .polish
+    var replyContext = ""
     var result: ActionResult = .empty
     var isStreaming: Bool = false
     var errorMessage: String?
@@ -17,22 +18,25 @@ final class PopupViewModel {
     var sourceOverride: String?    // nil = auto-detect
 
     private let providerStore: ProviderStore
-    private let refineModeStore: RefineModeStore
+    private let refinePromptStore: RefinePromptStore
     private let translateSettings: TranslateSettings
+    private let replySettings: ReplySettings
     private var streamTask: Task<Void, Never>?
 
     init(
         originalText: String,
         intent: WriteIntent,
         providerStore: ProviderStore,
-        refineModeStore: RefineModeStore,
-        translateSettings: TranslateSettings
+        refinePromptStore: RefinePromptStore,
+        translateSettings: TranslateSettings,
+        replySettings: ReplySettings
     ) {
         self.originalText = originalText
         self.intent = intent
         self.providerStore = providerStore
-        self.refineModeStore = refineModeStore
+        self.refinePromptStore = refinePromptStore
         self.translateSettings = translateSettings
+        self.replySettings = replySettings
     }
 
     var resultText: String { result.asText }
@@ -61,8 +65,10 @@ final class PopupViewModel {
         errorMessage = nil
         isStreaming = true
 
-        let captured = (originalText, intent, selectedRefineMode)
+        let captured = (originalText, intent, refineOptions)
+        let capturedReplyContext = replyContext
         streamTask = Task { @MainActor in
+            guard !Task.isCancelled else { return }
             do {
                 switch captured.1 {
                 case .refine:
@@ -71,10 +77,10 @@ final class PopupViewModel {
                     }
                     self.providerLabelInUse = provider.label
                     self.result = .streamingText("")
-                    let service = RefineService(providerStore: providerStore, modeStore: refineModeStore)
-                    let stream = try service.stream(text: captured.0, mode: captured.2, provider: provider)
+                    let service = RefineService(providerStore: providerStore, promptStore: refinePromptStore)
+                    let stream = try service.stream(text: captured.0, options: captured.2, provider: provider)
                     for try await delta in stream {
-                        if Task.isCancelled { break }
+                        if Task.isCancelled { return }
                         self.result = .streamingText(self.result.streamingText + delta.text)
                     }
                     if !Task.isCancelled {
@@ -83,8 +89,8 @@ final class PopupViewModel {
                             kind: .refine,
                             original: captured.0,
                             result: self.result.streamingText,
-                            modeOrTargetLang: captured.2.rawValue,
-                            provider: provider
+                            modeOrTargetLang: "polish",
+                            provider: provider, refineOptions: captured.2
                         )
                     }
                 case .translate:
@@ -97,7 +103,7 @@ final class PopupViewModel {
                     let (stream, target) = try service.stream(text: captured.0, provider: provider, targetOverride: self.targetOverride, sourceOverride: self.sourceOverride)
                     self.resolvedTargetLanguage = target
                     for try await delta in stream {
-                        if Task.isCancelled { break }
+                        if Task.isCancelled { return }
                         self.result = .streamingText(self.result.streamingText + delta.text)
                     }
                     if !Task.isCancelled {
@@ -109,6 +115,23 @@ final class PopupViewModel {
                             modeOrTargetLang: target,
                             provider: provider
                         )
+                    }
+                case .reply:
+                    guard let provider = providerStore.activeProvider, provider.kind.isLLMKind else {
+                        throw LLMError.noActiveProvider
+                    }
+                    self.providerLabelInUse = provider.label
+                    self.result = .streamingText("")
+                    let stream = try ReplyService(providerStore: providerStore, settings: replySettings).stream(
+                        message: captured.0, context: capturedReplyContext, provider: provider)
+                    for try await delta in stream {
+                        if Task.isCancelled { return }
+                        self.result = .streamingText(self.result.streamingText + delta.text)
+                    }
+                    if !Task.isCancelled {
+                        HistoryWriter.record(in: modelContext, kind: .reply, original: captured.0,
+                            result: self.result.streamingText, modeOrTargetLang: "reply", provider: provider,
+                            replyContext: capturedReplyContext)
                     }
                 case .dictionary:
                     guard let provider = activeDictionaryProvider else {
@@ -134,6 +157,7 @@ final class PopupViewModel {
                     self.errorMessage = error.localizedDescription
                 }
             }
+            guard !Task.isCancelled else { return }
             self.isStreaming = false
         }
     }
@@ -144,8 +168,8 @@ final class PopupViewModel {
         isStreaming = false
     }
 
-    func selectMode(_ mode: RefineMode, modelContext: ModelContext) {
-        selectedRefineMode = mode
+    func selectOptions(_ options: RefineOptions, modelContext: ModelContext) {
+        refineOptions = options
         run(modelContext: modelContext)
     }
 

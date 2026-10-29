@@ -1,14 +1,16 @@
 import Foundation
 
 enum ActionKind: Codable, Equatable, Sendable {
-    case refine(RefineMode)
+    case refine(RefineOptions)
     case translate
+    case reply
     case dictionary
 
     var label: String {
         switch self {
         case .refine(let mode): mode.label
         case .translate: String(localized: "Translate")
+        case .reply: String(localized: "Reply")
         case .dictionary: String(localized: "Dictionary")
         }
     }
@@ -17,6 +19,7 @@ enum ActionKind: Codable, Equatable, Sendable {
         switch self {
         case .refine(let mode): mode.symbol
         case .translate: "globe"
+        case .reply: "arrowshape.turn.up.left"
         case .dictionary: "book"
         }
     }
@@ -25,13 +28,14 @@ enum ActionKind: Codable, Equatable, Sendable {
         switch self {
         case .refine: .refine
         case .translate: .translate
+        case .reply: .reply
         case .dictionary: .dictionary
         }
     }
 
     var compatibleProviderKinds: (ProviderKind) -> Bool {
         switch self {
-        case .refine, .translate: { $0.isLLMKind }
+        case .refine, .translate, .reply: { $0.isLLMKind }
         case .dictionary: { $0.isDictionaryKind }
         }
     }
